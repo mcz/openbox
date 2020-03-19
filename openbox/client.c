@@ -3463,6 +3463,10 @@ void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk,
     }
 }
 
+void client_tile(ObClient *self, gboolean tile, ObDirection dir)
+{
+}
+
 void client_maximize(ObClient *self, gboolean max, gint dir)
 {
     gint x, y, w, h;
