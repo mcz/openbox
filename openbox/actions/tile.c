@@ -23,7 +23,7 @@ static gpointer setup_func(xmlNodePtr node)
     Options *o;
 
     o = g_slice_new0(Options);
-    o->dir = NORTHWEST;
+    o->dir = OB_DIRECTION_NORTHWEST;
 
     if ((n = obt_xml_find_node(node, "direction"))) {
         gchar *s = obt_xml_node_string(n);
@@ -63,7 +63,7 @@ static void free_func(gpointer o)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func_on(ObActionsData *data. gpointer options)
+static gboolean run_func_on(ObActionsData *data, gpointer options)
 {
     Options *o = options;
     if (data->client) {
@@ -75,7 +75,7 @@ static gboolean run_func_on(ObActionsData *data. gpointer options)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func_off(ObActionsData *data. gpointer options)
+static gboolean run_func_off(ObActionsData *data, gpointer options)
 {
     Options *o = options;
     if (data->client) {
