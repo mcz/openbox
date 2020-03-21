@@ -154,6 +154,8 @@ struct _ObClient
     /*! Remember if the window was maximized before going fullscreen */
     gboolean pre_fullscreen_max_horz,
              pre_fullscreen_max_vert;
+    /*! Position and size of the window prior to being tiled */
+    Rect pre_tile_area;
 
     /*! The window's strut
       The strut defines areas of the screen that are marked off-bounds for
@@ -268,6 +270,8 @@ struct _ObClient
     gboolean max_vert;
     /*! The window is maximized to fill the screen horizontally */
     gboolean max_horz;
+    /*! The window is tiled to one of 8 set positions */
+    gboolean tiled;
     /*! The window should not be displayed by pagers */
     gboolean skip_pager;
     /*! The window should not be displayed by taskbars */
@@ -522,6 +526,15 @@ gboolean client_is_oldfullscreen(const ObClient *self, const Rect *area);
 */
 void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk,
                     gboolean hide_animation);
+
+/*! Tile or untile the client window
+  @param tile true if the window should be tiled; false if it should be
+             returned to its pre-tiled size/position.
+  @param dir is set to one of the eight cardinal directions the window is tiled
+             to; North, East, South, and West fill half the screen, while the
+             rest fills a quarter
+*/
+void client_tile(ObClient *self, gboolean tile, ObDirection dir);
 
 /*! Maximize or unmaximize the client window
   @param max true if the window should be maximized; false if it should be
