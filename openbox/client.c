@@ -3564,6 +3564,19 @@ void client_tile(ObClient *self, gboolean tile, ObDirection dir)
 
             g_slice_free(Rect, sarea);
         }
+
+        gint *x = area.x, *y = area.y;
+
+        /* get client coordinates */
+        frame_frame_gravity(self->frame, &x, &y);
+        area.x = *x;
+        area.y = *y;
+        g_free(x);
+        g_free(y);
+
+        /* calculate client area from window area */
+        area.width -= self->frame->size.left + self->frame->size.right;
+        area.height -= self->frame->size.top + self->frame->size.bottom;
     }
 
     client_move_resize(self, area.x, area.y, area.width, area.height);
