@@ -3465,17 +3465,16 @@ void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk,
 
 void client_tile(ObClient *self, gboolean tile, ObDirection dir)
 {
-    Rect *area;
 
     /* Don't untile a window that isn't tiled. We can tile a tiled window though
        because the tiling direction could have changed. */
     if (!tile && !self->tiled) return;
 
-    area = self->area;
+    Rect area = self->area;
 
     if (tile) {
         if (!self->tiled){
-            self->pre_tile_area = self->area;
+            self->pre_tile_area = area;
         }
     } else {
         g_assert(self->pre_tile_area.width > 0 &&
@@ -3493,74 +3492,74 @@ void client_tile(ObClient *self, gboolean tile, ObDirection dir)
         mon = client_monitor(self);
         sarea = screen_area(self->desktop, mon, NULL);
 
-        switch dir {
+        switch (dir) {
         case OB_DIRECTION_NORTH:
             RECT_SET(area,
-                     sarea.x,
-                     sarea.y,
-                     sarea.width,
-                     (sarea.height / 2) +
-                     (sarea.height % 2 ) ? 1 : 0);
+                     sarea->x,
+                     sarea->y,
+                     sarea->width,
+                     (sarea->height / 2) +
+                     (sarea->height % 2 ) ? 1 : 0);
             break;
         case OB_DIRECTION_NORTHEAST:
             RECT_SET(area,
-                     (sarea.x + sarea.width / 2) +
-                     (sarea.width % 2) ? 1 : 0,
-                     sarea.y,
-                     (sarea.width / 2),
-                     (sarea.height / 2) +
-                     (sarea.height % 2 ) ? 1 : 0);
+                     (sarea->x + sarea->width / 2) +
+                     (sarea->width % 2) ? 1 : 0,
+                     sarea->y,
+                     (sarea->width / 2),
+                     (sarea->height / 2) +
+                     (sarea->height % 2 ) ? 1 : 0);
             break;
         case OB_DIRECTION_EAST:
             RECT_SET(area,
-                     (sarea.x, + sarea.width / 2) +
-                     (sarea.width % 2) ? 1 : 0,
-                     sarea.y,
-                     (sarea.width / 2),
-                     sarea.height);
+                     (sarea->x, + sarea->width / 2) +
+                     (sarea->width % 2) ? 1 : 0,
+                     sarea->y,
+                     (sarea->width / 2),
+                     sarea->height);
             break;
         case OB_DIRECTION_SOUTHEAST:
             RECT_SET(area,
-                     (sarea.x, + sarea.width / 2) +
-                     (sarea.width % 2) ? 1 : 0,
-                     (sarea.y, + sarea.height / 2) +
-                     (sarea.height % 2) ? 1 : 0,
-                     (sarea.width / 2),
-                     (sarea.height / 2 ));
+                     (sarea->x, + sarea->width / 2) +
+                     (sarea->width % 2) ? 1 : 0,
+                     (sarea->y, + sarea->height / 2) +
+                     (sarea->height % 2) ? 1 : 0,
+                     (sarea->width / 2),
+                     (sarea->height / 2 ));
             break;
         case OB_DIRECTION_SOUTH:
             RECT_SET(area,
-                     sarea.x,
-                     (sarea.y, + sarea.height / 2) +
-                     (sarea.height % 2) ? 1 : 0,
-                     sarea.width,
-                     (sarea.height / 2));
+                     sarea->x,
+                     (sarea->y, + sarea->height / 2) +
+                     (sarea->height % 2) ? 1 : 0,
+                     sarea->width,
+                     (sarea->height / 2));
             break;
         case OB_DIRECTION_SOUTHWEST:
             RECT_SET(area,
-                     sarea.x,
-                     (sarea.y, + sarea.height / 2) +
-                     (sarea.height % 2) ? 1 : 0,
-                     (sarea.width / 2) +
-                     (sarea.width % 2) ? 1 : 0,
-                     (sarea.height / 2));
+                     sarea->x,
+                     (sarea->y, + sarea->height / 2) +
+                     (sarea->height % 2) ? 1 : 0,
+                     (sarea->width / 2) +
+                     (sarea->width % 2) ? 1 : 0,
+                     (sarea->height / 2));
             break;
         case OB_DIRECTION_WEST:
             RECT_SET(area,
-                     sarea.x,
-                     sarea.y,
-                     (sarea.width / 2) +
-                     (sarea.width % 2) ? 1 : 0,
-                     sarea.height);
+                     sarea->x,
+                     sarea->y,
+                     (sarea->width / 2) +
+                     (sarea->width % 2) ? 1 : 0,
+                     sarea->height);
             break;
         case OB_DIRECTION_NORTHWEST:
             RECT_SET(area,
-                     sarea.x,
-                     sarea.y,
-                     (sarea.width / 2) +
-                     (sarea.width % 2) ? 1 : 0,
-                     (sarea.height / 2) +
-                     (sarea.height % 2 ) ? 1 : 0);
+                     sarea->x,
+                     sarea->y,
+                     (sarea->width / 2) +
+                     (sarea->width % 2) ? 1 : 0,
+                     (sarea->height / 2) +
+                     (sarea->height % 2 ) ? 1 : 0);
             break;
 
             g_slice_free(Rect, sarea);
@@ -3568,7 +3567,6 @@ void client_tile(ObClient *self, gboolean tile, ObDirection dir)
     }
 
     client_move_resize(self, area.x, area.y, area.width, area.height);
-    g_slice_free(Rect, area);
 }
 
 void client_maximize(ObClient *self, gboolean max, gint dir)
