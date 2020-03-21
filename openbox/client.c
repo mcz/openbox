@@ -3499,49 +3499,49 @@ void client_tile(ObClient *self, gboolean tile, ObDirection dir)
                      sarea->y,
                      sarea->width,
                      (sarea->height / 2) +
-                     (sarea->height % 2 ) ? 1 : 0);
+                     ((sarea->height % 2 ) ? 1 : 0));
             break;
         case OB_DIRECTION_NORTHEAST:
             RECT_SET(area,
-                     (sarea->x + sarea->width / 2) +
-                     (sarea->width % 2) ? 1 : 0,
+                     (sarea->x + (sarea->width / 2)) +
+                     ((sarea->width % 2) ? 1 : 0),
                      sarea->y,
                      (sarea->width / 2),
                      (sarea->height / 2) +
-                     (sarea->height % 2 ) ? 1 : 0);
+                     ((sarea->height % 2 ) ? 1 : 0));
             break;
         case OB_DIRECTION_EAST:
             RECT_SET(area,
-                     (sarea->x, + sarea->width / 2) +
-                     (sarea->width % 2) ? 1 : 0,
+                     (sarea->x + (sarea->width / 2)) +
+                     ((sarea->width % 2) ? 1 : 0),
                      sarea->y,
                      (sarea->width / 2),
                      sarea->height);
             break;
         case OB_DIRECTION_SOUTHEAST:
             RECT_SET(area,
-                     (sarea->x, + sarea->width / 2) +
-                     (sarea->width % 2) ? 1 : 0,
-                     (sarea->y, + sarea->height / 2) +
-                     (sarea->height % 2) ? 1 : 0,
+                     (sarea->x + (sarea->width / 2)) +
+                     ((sarea->width % 2) ? 1 : 0),
+                     (sarea->y + (sarea->height / 2)) +
+                     ((sarea->height % 2) ? 1 : 0),
                      (sarea->width / 2),
                      (sarea->height / 2 ));
             break;
         case OB_DIRECTION_SOUTH:
             RECT_SET(area,
                      sarea->x,
-                     (sarea->y, + sarea->height / 2) +
-                     (sarea->height % 2) ? 1 : 0,
+                     (sarea->y + (sarea->height / 2)) +
+                     ((sarea->height % 2) ? 1 : 0),
                      sarea->width,
                      (sarea->height / 2));
             break;
         case OB_DIRECTION_SOUTHWEST:
             RECT_SET(area,
                      sarea->x,
-                     (sarea->y, + sarea->height / 2) +
-                     (sarea->height % 2) ? 1 : 0,
+                     (sarea->y + (sarea->height / 2)) +
+                     ((sarea->height % 2) ? 1 : 0),
                      (sarea->width / 2) +
-                     (sarea->width % 2) ? 1 : 0,
+                     ((sarea->width % 2) ? 1 : 0),
                      (sarea->height / 2));
             break;
         case OB_DIRECTION_WEST:
@@ -3549,7 +3549,7 @@ void client_tile(ObClient *self, gboolean tile, ObDirection dir)
                      sarea->x,
                      sarea->y,
                      (sarea->width / 2) +
-                     (sarea->width % 2) ? 1 : 0,
+                     ((sarea->width % 2) ? 1 : 0),
                      sarea->height);
             break;
         case OB_DIRECTION_NORTHWEST:
@@ -3557,9 +3557,9 @@ void client_tile(ObClient *self, gboolean tile, ObDirection dir)
                      sarea->x,
                      sarea->y,
                      (sarea->width / 2) +
-                     (sarea->width % 2) ? 1 : 0,
+                     ((sarea->width % 2) ? 1 : 0),
                      (sarea->height / 2) +
-                     (sarea->height % 2 ) ? 1 : 0);
+                     ((sarea->height % 2 ) ? 1 : 0));
             break;
 
             g_slice_free(Rect, sarea);
