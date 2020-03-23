@@ -3040,6 +3040,68 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
                          is maximizing */
 
         g_slice_free(Rect, a);
+    } else if (self->tiled) {
+        Rect *a;
+        guint i;
+
+        i = screen_find_monitor(&desired);
+        a = screen_area(self->desktop, i, &desired);
+
+        /* when setting widthi/height to 50% of an odd amount of pixels,
+           give the extra one to the top/left client */
+        switch (self->tile_dir) {
+        case OB_DIRECTION_NORTH:
+            *x = a->x;
+            *y = a->y;
+            *w = a->width;
+            *h = (a->height / 2) + ((a->height % 2 ) ? 1 : 0);
+            break;
+        case OB_DIRECTION_NORTHEAST:
+            *x = (a->x + (a->width / 2)) + ((a->width % 2) ? 1 : 0);
+            *y = a->y;
+            *w = (a->width / 2);
+            *h = (a->height / 2) + ((a->height % 2 ) ? 1 : 0);
+            break;
+        case OB_DIRECTION_EAST:
+            *x = (a->x + (a->width / 2)) + ((a->width % 2) ? 1 : 0);
+            *y = a->y;
+            *w = (a->width / 2);
+            *h = a->height;
+            break;
+        case OB_DIRECTION_SOUTHEAST:
+            *x = (a->x + (a->width / 2)) + ((a->width % 2) ? 1 : 0);
+            *y = (a->y + (a->height / 2)) + ((a->height % 2) ? 1 : 0);
+            *w = (a->width / 2);
+            *h = (a->height / 2 );
+            break;
+        case OB_DIRECTION_SOUTH:
+            *x = a->x;
+            *y = (a->y + (a->height / 2)) + ((a->height % 2) ? 1 : 0);
+            *w = a->width;
+            *h = (a->height / 2);
+            break;
+        case OB_DIRECTION_SOUTHWEST:
+            *x = a->x;
+            *y = (a->y + (a->height / 2)) + ((a->height % 2) ? 1 : 0);
+            *w = (a->width / 2) + ((a->width % 2) ? 1 : 0);
+            *h = (a->height / 2);
+            break;
+        case OB_DIRECTION_WEST:
+            *x = a->x;
+            *y = a->y;
+            *w = (a->width / 2) + ((a->width % 2) ? 1 : 0);
+            *h = a->height;
+            break;
+        case OB_DIRECTION_NORTHWEST:
+            *x = a->x;
+            *y = a->y;
+            *w = (a->width / 2) + ((a->width % 2) ? 1 : 0);
+            *h = (a->height / 2) + ((a->height % 2 ) ? 1 : 0);
+            break;
+        }
+
+        *w -= self->frame->size.left + self->frame->size.right;
+        *h -= self->frame->size.top + self->frame->size.bottom;
     }
 
     /* gets the client's position */
@@ -3465,121 +3527,42 @@ void client_iconify(ObClient *self, gboolean iconic, gboolean curdesk,
 
 void client_tile(ObClient *self, gboolean tile, ObDirection dir)
 {
+    gint x, y, w, h;
 
     /* Don't untile a window that isn't tiled. We can tile a tiled window though
        because the tiling direction could have changed. */
     if (!tile && !self->tiled) return;
 
-    Rect area = self->area;
+    /* these will help configure_full figure out which screen to fill with
+       the window */
+    x = self->area.x;
+    y = self->area.y;
+    w = self->area.width;
+    h = self->area.height;
 
     if (tile) {
         if (!self->tiled){
-            self->pre_tile_area = area;
+            RECT_SET(self->pre_tile_area,
+                     x, y, w, h);
         }
     } else {
         g_assert(self->pre_tile_area.width > 0 &&
                  self->pre_tile_area.height > 0);
-        area = self->pre_tile_area;
+        x = self->pre_tile_area.x;
+        y = self->pre_tile_area.y;
+        w = self->pre_tile_area.width;
+        h = self->pre_tile_area.height;
+
         RECT_SET(self->pre_tile_area, 0, 0, 0, 0);
     }
 
     self->tiled = tile;
+    self->tile_dir = dir;
 
     if (tile) {
-        guint mon;
-        Rect *sarea;
-
-        mon = client_monitor(self);
-        sarea = screen_area(self->desktop, mon, NULL);
-
-        switch (dir) {
-        case OB_DIRECTION_NORTH:
-            RECT_SET(area,
-                     sarea->x,
-                     sarea->y,
-                     sarea->width,
-                     (sarea->height / 2) +
-                     ((sarea->height % 2 ) ? 1 : 0));
-            break;
-        case OB_DIRECTION_NORTHEAST:
-            RECT_SET(area,
-                     (sarea->x + (sarea->width / 2)) +
-                     ((sarea->width % 2) ? 1 : 0),
-                     sarea->y,
-                     (sarea->width / 2),
-                     (sarea->height / 2) +
-                     ((sarea->height % 2 ) ? 1 : 0));
-            break;
-        case OB_DIRECTION_EAST:
-            RECT_SET(area,
-                     (sarea->x + (sarea->width / 2)) +
-                     ((sarea->width % 2) ? 1 : 0),
-                     sarea->y,
-                     (sarea->width / 2),
-                     sarea->height);
-            break;
-        case OB_DIRECTION_SOUTHEAST:
-            RECT_SET(area,
-                     (sarea->x + (sarea->width / 2)) +
-                     ((sarea->width % 2) ? 1 : 0),
-                     (sarea->y + (sarea->height / 2)) +
-                     ((sarea->height % 2) ? 1 : 0),
-                     (sarea->width / 2),
-                     (sarea->height / 2 ));
-            break;
-        case OB_DIRECTION_SOUTH:
-            RECT_SET(area,
-                     sarea->x,
-                     (sarea->y + (sarea->height / 2)) +
-                     ((sarea->height % 2) ? 1 : 0),
-                     sarea->width,
-                     (sarea->height / 2));
-            break;
-        case OB_DIRECTION_SOUTHWEST:
-            RECT_SET(area,
-                     sarea->x,
-                     (sarea->y + (sarea->height / 2)) +
-                     ((sarea->height % 2) ? 1 : 0),
-                     (sarea->width / 2) +
-                     ((sarea->width % 2) ? 1 : 0),
-                     (sarea->height / 2));
-            break;
-        case OB_DIRECTION_WEST:
-            RECT_SET(area,
-                     sarea->x,
-                     sarea->y,
-                     (sarea->width / 2) +
-                     ((sarea->width % 2) ? 1 : 0),
-                     sarea->height);
-            break;
-        case OB_DIRECTION_NORTHWEST:
-            RECT_SET(area,
-                     sarea->x,
-                     sarea->y,
-                     (sarea->width / 2) +
-                     ((sarea->width % 2) ? 1 : 0),
-                     (sarea->height / 2) +
-                     ((sarea->height % 2 ) ? 1 : 0));
-            break;
-
-            g_slice_free(Rect, sarea);
-        }
-
-        gint *x = area.x, *y = area.y;
-
-        /* get client coordinates */
-        frame_frame_gravity(self->frame, &x, &y);
-        area.x = *x;
-        area.y = *y;
-        g_free(x);
-        g_free(y);
-
-        /* calculate client area from window area */
-        area.width -= self->frame->size.left + self->frame->size.right;
-        area.height -= self->frame->size.top + self->frame->size.bottom;
+        client_find_onscreen(self, &x, &y, w, h, FALSE);
     }
-
-    client_move_resize(self, area.x, area.y, area.width, area.height);
+    client_move_resize(self, x, y, w, h);
 }
 
 void client_maximize(ObClient *self, gboolean max, gint dir)

@@ -272,6 +272,8 @@ struct _ObClient
     gboolean max_horz;
     /*! The window is tiled to one of 8 set positions */
     gboolean tiled;
+    /*! The direction the window is tiled to */
+    ObDirection tile_dir;
     /*! The window should not be displayed by pagers */
     gboolean skip_pager;
     /*! The window should not be displayed by taskbars */
