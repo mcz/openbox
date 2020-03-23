@@ -3100,8 +3100,8 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
             break;
         }
 
-        area.width -= self->frame->size.left + self->frame->size.right;
-        area.height -= self->frame->size.top + self->frame->size.bottom;
+        *w -= self->frame->size.left + self->frame->size.right;
+        *h -= self->frame->size.top + self->frame->size.bottom;
     }
 
     /* gets the client's position */
@@ -3560,7 +3560,7 @@ void client_tile(ObClient *self, gboolean tile, ObDirection dir)
     self->tile_dir = dir;
 
     if (tile) {
-        client_find_onscreen(self, &x, &y, w, h, FLASE);
+        client_find_onscreen(self, &x, &y, w, h, FALSE);
     }
     client_move_resize(self, x, y, w, h);
 }
