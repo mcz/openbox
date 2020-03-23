@@ -3542,7 +3542,7 @@ void client_tile(ObClient *self, gboolean tile, ObDirection dir)
 
     if (tile) {
         if (!self->tiled){
-            RECT_SET(seft->pre_tile_area,
+            RECT_SET(self->pre_tile_area,
                      x, y, w, h);
         }
     } else {
