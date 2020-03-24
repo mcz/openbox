@@ -55,8 +55,8 @@ static gboolean moving = FALSE; /* TRUE - moving, FALSE - resizing */
 /* starting geometry for the window being moved/resized, so it can be
    restored */
 static gint start_x, start_y, start_cx, start_cy, start_cw, start_ch;
-static gboolean was_max_horz, was_max_vert;
-static Rect pre_max_area;
+static gboolean was_max_horz, was_max_vert, was_tiled;
+static Rect pre_max_area, pre_tile_area;
 static gint cur_x, cur_y, cur_w, cur_h;
 static guint button;
 static guint32 corner;
@@ -250,7 +250,7 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     key_resize_edge = -1;
 
     /* default to not putting max back on cancel */
-    was_max_horz = was_max_vert = FALSE;
+    was_max_horz = was_max_vert = was_tiled = FALSE;
 
     /*
       have to change start_cx and start_cy if going to do this..
@@ -340,6 +340,21 @@ void moveresize_end(gboolean cancel)
                      (cancel ? start_cw : cur_w),
                      (cancel ? start_ch : cur_h),
                      TRUE, TRUE, FALSE);
+
+    /* restore the client's tiled state. do this before we restore
+       maximization as that takes precedence over tiling */
+    if (cancel && was_tiled) {
+        const gboolean t = moveresize_client->tiled;
+
+        client_tile(moveresize_client, TRUE, moveresize_client->tile_dir);
+
+        if (was_tiled && !t) {
+            moveresize_client->pre_tile_area.x = pre_tile_area.x;
+            moveresize_client->pre_tile_area.y = pre_tile_area.y;
+            moveresize_client->pre_tile_area.width = pre_tile_area.width;
+            moveresize_client->pre_tile_area.height = pre_tile_area.height;
+        }
+    }
 
     /* restore the client's maximized state. do this after putting the window
        back in its original spot to minimize visible flicker */
@@ -891,6 +906,26 @@ static void resize_with_keys(KeySym sym, guint state)
         client_maximize(moveresize_client, FALSE, 2);
     }
 
+    if (moveresize_client->tiled &&
+        (key_resize_edge == OB_DIRECTION_NORTH ||
+         key_resize_edge == OB_DIRECTION_EAST ||
+         key_resize_edge == OB_DIRECTION_SOUTH ||
+         key_resize_edge == OB_DIRECTION_WEST))
+    {
+        /* untile */
+        was_tiled = TRUE;
+        pre_tile_area.x = moveresize_client->pre_tile_area.x;
+        moveresize_client->pre_tile_area.y = cur_y;
+        pre_tile_area.width = moveresize_client->pre_tile_area.width;
+        moveresize_client->pre_tile_area.height = cur_h;
+
+        moveresize_client->pre_tile_area.x = cur_x;
+        moveresize_client->pre_tile_area.y = cur_y;
+        moveresize_client->pre_tile_area.width = cur_w;
+        moveresize_client->pre_tile_area.height = cur_h;
+        client_tile(moveresize_client, FALSE, moveresize_client->tile_dir);
+    }
+
     calc_resize(TRUE, resist, &dw, &dh, dir);
     if (key_resize_edge == OB_DIRECTION_WEST)
         cur_x -= dw;
@@ -1042,6 +1077,38 @@ gboolean moveresize_event(XEvent *e)
                 moveresize_client->pre_max_area.y = pre_max_area.y;
                 moveresize_client->pre_max_area.height = pre_max_area.height;
             }
+
+            if (ABS(dw) >= config_resist_edge ||
+                ABS(dh) >= config_resist_edge)
+            {
+                if (moveresize_client->tiled) {
+                    /* untile */
+                    was_tiled = TRUE;
+                    pre_tile_area.x = moveresize_client->pre_tile_area.x;
+                    pre_tile_area.y = moveresize_client->pre_tile_area.y;
+                    pre_tile_area.width =
+                        moveresize_client->pre_tile_area.width;
+                    pre_tile_area.height =
+                        moveresize_client->pre_tile_area.height;
+
+                    moveresize_client->pre_tile_area.x = cur_x;
+                    moveresize_client->pre_tile_area.y = cur_y;
+                    moveresize_client->pre_tile_area.width = cur_w;
+                    moveresize_client->pre_tile_area.height = cur_h;
+                    client_tile(moveresize_client, FALSE,
+                                  moveresize_client->tile_dir);
+                }
+            }
+            else if (was_tiled && !moveresize_client->tiled) {
+                /* retile and put the pretile back */
+                client_tile(moveresize_client, TRUE,
+                            moveresize_client->tile_dir);
+                moveresize_client->pre_tile_area.x = pre_tile_area.x;
+                moveresize_client->pre_tile_area.y = pre_tile_area.y;
+                moveresize_client->pre_tile_area.width = pre_tile_area.width;
+                moveresize_client->pre_tile_area.height = pre_tile_area.height;
+            }
+
 
             dw -= cur_w - start_cw;
             dh -= cur_h - start_ch;

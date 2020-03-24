@@ -673,8 +673,10 @@ void client_unmanage(ObClient *self)
                 a.height = self->pre_max_area.height;
             }
         }
+        else if (self->tiled)
+            a = self->pre_tile_area;
 
-        self->fullscreen = self->max_horz = self->max_vert = FALSE;
+        self->fullscreen = self->max_horz = self->max_vert = self->tiled = FALSE;
         /* let it be moved and resized no matter what */
         self->functions = OB_CLIENT_FUNC_MOVE | OB_CLIENT_FUNC_RESIZE;
         self->decorations = 0; /* unmanaged windows have no decor */
@@ -1998,7 +2000,8 @@ static void client_change_allowed_actions(ObClient *self)
         else self->fullscreen = FALSE;
     }
     if (!(self->functions & OB_CLIENT_FUNC_MAXIMIZE) && (self->max_horz ||
-                                                         self->max_vert)) {
+                                                         self->max_vert))
+    {
         if (self->frame) client_maximize(self, FALSE, 0);
         else self->max_vert = self->max_horz = FALSE;
     }
@@ -3557,9 +3560,9 @@ void client_tile(ObClient *self, gboolean tile, ObDirection dir)
     }
 
     self->tiled = tile;
-    self->tile_dir = dir;
 
     if (tile) {
+        self->tile_dir = dir;
         client_find_onscreen(self, &x, &y, w, h, FALSE);
     }
     client_move_resize(self, x, y, w, h);
