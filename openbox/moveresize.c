@@ -346,7 +346,7 @@ void moveresize_end(gboolean cancel)
     if (cancel && was_tiled) {
         const gboolean t = moveresize_client->tiled;
 
-        client_tile(moveresize_client, TRUE, moveresizeclient->tile_dir);
+        client_tile(moveresize_client, TRUE, moveresize_client->tile_dir);
 
         if (was_tiled && !t) {
             moveresize_client->pre_tile_area.x = pre_tile_area.x;
