@@ -56,6 +56,8 @@ typedef struct {
     gboolean maxhorz_off;
     gboolean maxfull_on;
     gboolean maxfull_off;
+    gboolean tile_on;
+    gboolean tile_off;
     gboolean iconic_on;
     gboolean iconic_off;
     gboolean focused;
@@ -180,6 +182,7 @@ static void setup_query(Options* o, xmlNodePtr node, QueryTarget target) {
     set_bool(node, "maximized", &q->maxfull_on, &q->maxfull_off);
     set_bool(node, "maximizedhorizontal", &q->maxhorz_on, &q->maxhorz_off);
     set_bool(node, "maximizedvertical", &q->maxvert_on, &q->maxvert_off);
+    set_bool(node, "tiled", &q->tile_on, &q->tile_off);
     set_bool(node, "iconified", &q->iconic_on, &q->iconic_off);
     set_bool(node, "focused", &q->focused, &q->unfocused);
     set_bool(node, "urgent", &q->urgent_on, &q->urgent_off);
@@ -359,6 +362,11 @@ static gboolean run_func_if(ObActionsData *data, gpointer options)
             is_true &= is_max_full;
         if (q->maxfull_off)
             is_true &= !is_max_full;
+
+        if (q->tile_on)
+            is_true &= query_target->tiled;
+        if (q->tile_off)
+            is_true &= !query_target->tiled;
 
         if (q->focused)
             is_true &= query_target == focus_client;
