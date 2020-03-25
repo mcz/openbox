@@ -1046,20 +1046,21 @@ gboolean moveresize_event(XEvent *e)
                 }
                 if (moveresize_client->tiled) {
                     /* untile */
-                    was_tiled_vert = TRUE;
-                    pre_tile.x = moveresize_client->pre_tile_area.x
-                    pre_tile.y = moveresize_client->pre_tile_area.y
+                    was_tiled = TRUE;
+                    pre_tile_area.x = moveresize_client->pre_tile_area.x;
+                    pre_tile_area.y = moveresize_client->pre_tile_area.y;
 
                     moveresize_client->pre_tile_area.x = cur_x;
                     moveresize_client->pre_tile_area.y = cur_y;
-                    client_tile(moveresize_client, FALSE, NULL);
+                    client_tile(moveresize_client, FALSE,
+                                moveresize_client->tile_dir);
                 }
             }
             else {
                 if (was_tiled && !moveresize_client->tiled) {
                     /* retile and put pre-tile back */
                     client_tile(moveresize_client, TRUE,
-                                moversize_client->tile_dir);
+                                moveresize_client->tile_dir);
                     moveresize_client->pre_tile_area.x = pre_tile_area.x;
                     moveresize_client->pre_tile_area.y = pre_tile_area.y;
                 }
