@@ -91,6 +91,7 @@ gint     config_mouse_threshold;
 gint     config_mouse_dclicktime;
 gint     config_mouse_screenedgetime;
 gboolean config_mouse_screenedgewarp;
+ObEdgeAction    config_mouse_edgeaction;
 
 guint    config_menu_hide_delay;
 gboolean config_menu_middle;
@@ -534,7 +535,7 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
         config_mouse_threshold = obt_xml_node_int(n);
     if ((n = obt_xml_find_node(node, "doubleClickTime")))
         config_mouse_dclicktime = obt_xml_node_int(n);
-    if ((n = obt_xml_find_node(node, "screenEdgeWarpTime"))) {
+    if ((n = obt_xml_find_node(node, "screenEdgeActionTime"))) {
         config_mouse_screenedgetime = obt_xml_node_int(n);
         /* minimum value of 25 for this property, when it is 1 and you hit the
            edge it basically never stops */
@@ -543,6 +544,15 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
     }
     if ((n = obt_xml_find_node(node, "screenEdgeWarpMouse")))
         config_mouse_screenedgewarp = obt_xml_node_bool(n);
+
+    if ((n = obt_xml_find_node(node, "screenEdgeAction"))) {
+        if ((obt_xml_node_contains(n, "None")))
+            config_mouse_edgeaction = OB_EDGE_ACTION_NONE;
+        else if ((obt_xml_node_contains(n, "Snap")))
+            config_mouse_edgeaction = OB_EDGE_ACTION_SNAP;
+        else
+            config_mouse_edgeaction = OB_EDGE_ACTION_WARP;
+    }
 
     for (n = obt_xml_find_node(node, "context");
          n;

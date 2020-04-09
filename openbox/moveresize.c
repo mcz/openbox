@@ -58,11 +58,12 @@ static gint start_x, start_y, start_cx, start_cy, start_cw, start_ch;
 static gboolean was_max_horz, was_max_vert, was_tiled;
 static Rect pre_max_area, pre_tile_area;
 static gint cur_x, cur_y, cur_w, cur_h;
+static gint resize_x, resize_y;
 static guint button;
 static guint32 corner;
-static ObDirection edge_warp_dir = -1;
-static gboolean edge_warp_odd = FALSE;
-static guint edge_warp_timer = 0;
+static ObDirection edge_action_dir = -1;
+static gboolean edge_action_odd = FALSE;
+static guint edge_action_timer = 0;
 static ObDirection key_resize_edge = -1;
 static guint waiting_for_sync;
 #ifdef SYNC
@@ -74,7 +75,8 @@ static ObPopup *popup = NULL;
 static void do_move(gboolean keyboard, gint keydist);
 static void do_resize(void);
 static void do_edge_warp(gint x, gint y);
-static void cancel_edge_warp();
+static void do_edge_snap(gint x, gint y);
+static void cancel_edge_action();
 #ifdef SYNC
 static gboolean sync_timeout_func(gpointer data);
 #endif
@@ -239,6 +241,7 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     start_cy = c->area.y;
     start_cw = c->area.width;
     start_ch = c->area.height;
+    resize_x = resize_y = 0;
     /* these adjustments for the size_inc make resizing a terminal more
        friendly. you essentially start the resize in the middle of the
        increment instead of at 0, so you have to move half an increment
@@ -379,7 +382,7 @@ void moveresize_end(gboolean cancel)
     }
 
     /* dont edge warp after its ended */
-    cancel_edge_warp();
+    cancel_edge_action();
 
     moveresize_in_progress = FALSE;
     moveresize_client = NULL;
@@ -600,7 +603,7 @@ static void edge_warp_move_ptr(void)
     screen_pointer_pos(&x, &y);
     a = screen_physical_area_all_monitors();
 
-    switch (edge_warp_dir) {
+    switch (edge_action_dir) {
     case OB_DIRECTION_NORTH:
         y = a->height - 1;
         break;
@@ -626,14 +629,14 @@ static gboolean edge_warp_delay_func(gpointer data)
 
     /* only fire every second time. so it's fast the first time, but slower
        after that */
-    if (edge_warp_odd) {
-        d = screen_find_desktop(screen_desktop, edge_warp_dir, TRUE, FALSE);
+    if (edge_action_odd) {
+        d = screen_find_desktop(screen_desktop, edge_action_dir, TRUE, FALSE);
         if (d != screen_desktop) {
             if (config_mouse_screenedgewarp) edge_warp_move_ptr();
             screen_set_desktop(d, TRUE);
         }
     }
-    edge_warp_odd = !edge_warp_odd;
+    edge_action_odd = !edge_action_odd;
 
     return TRUE; /* do repeat ! */
 }
@@ -671,21 +674,136 @@ static void do_edge_warp(gint x, gint y)
         }
     }
 
-    if (dir != edge_warp_dir) {
-        cancel_edge_warp();
+    if (dir != edge_action_dir) {
+        cancel_edge_action();
         if (dir != (ObDirection)-1) {
-            edge_warp_odd = TRUE; /* switch on the first timeout */
-            edge_warp_timer = g_timeout_add(config_mouse_screenedgetime,
+            edge_action_odd = TRUE; /* switch on the first timeout */
+            edge_action_timer = g_timeout_add(config_mouse_screenedgetime,
                                             edge_warp_delay_func, NULL);
         }
-        edge_warp_dir = dir;
+        edge_action_dir = dir;
     }
 }
 
-static void cancel_edge_warp(void)
+static void edge_snap_cleanup(gpointer data)
 {
-    if (edge_warp_timer) g_source_remove(edge_warp_timer);
-    edge_warp_timer = 0;
+    g_free(data);
+    edge_action_timer = 0;
+}
+
+static gboolean edge_snap_delay_func(gpointer data)
+{
+    int x, y;
+
+    client_tile(moveresize_client, TRUE, edge_action_dir);
+
+    /* Trust me */
+    x = (int)((float)((((Point *)data)->x - cur_x) * moveresize_client->area.width /
+         moveresize_client->pre_tile_area.width) + moveresize_client->area.x);
+    y = (int)((float)((((Point *)data)->y - cur_y) * moveresize_client->area.height /
+         moveresize_client->pre_tile_area.height) + moveresize_client->area.y);
+
+    XWarpPointer(obt_display, None, obt_root(ob_screen), 0, 0, 0, 0, x, y);
+
+    /* steal the motion events this causes */
+    XSync(obt_display, FALSE);
+    {
+        XEvent ce;
+        while (xqueue_remove_local(&ce, xqueue_match_type,
+                                   GINT_TO_POINTER(MotionNotify)));
+    }
+
+    start_cx = moveresize_client->area.x;
+    start_cy = moveresize_client->area.y;
+    start_x = x;
+    start_y = y;
+    resize_x = resize_y = 0;
+
+    return FALSE; /* don't repeat ! */
+}
+
+static void do_edge_snap(gint x, gint y)
+{
+    if (!config_mouse_screenedgetime) return;
+
+    int i;
+    ObDirection dir;
+    gpointer pt = g_malloc(sizeof(Point));
+
+    dir = -1;
+
+    for (i = 0; i < screen_num_monitors; ++i) {
+        const Rect *a = screen_physical_area_monitor(i);
+
+        if (!RECT_CONTAINS(*a, x, y))
+            continue;
+
+        if (x == RECT_LEFT(*a)) {
+            if (y <= (a->height / 4 + RECT_TOP(*a)))
+                dir = OB_DIRECTION_NORTHWEST;
+            else if (y >= (a->height / -4 + RECT_BOTTOM(*a)))
+                dir = OB_DIRECTION_SOUTHWEST;
+            else
+                dir = OB_DIRECTION_WEST;
+        }
+
+        else if (x == RECT_RIGHT(*a)) {
+            if (y <= (a->height / 4 + RECT_TOP(*a)))
+                dir = OB_DIRECTION_NORTHEAST;
+            else if (y >= (a->height / -4 + RECT_BOTTOM(*a)))
+                dir = OB_DIRECTION_SOUTHEAST;
+            else
+                dir = OB_DIRECTION_EAST;
+        }
+
+        else if (y == RECT_TOP(*a)) {
+            if (x <= (a->width / 4 + RECT_LEFT(*a)))
+                dir = OB_DIRECTION_NORTHWEST;
+            else if (x >= (a->width / -4 + RECT_RIGHT(*a)))
+                dir = OB_DIRECTION_NORTHEAST;
+            else
+                dir = OB_DIRECTION_NORTH;
+        }
+
+        else if (y == RECT_BOTTOM(*a)) {
+            if (x <= (a->width / 4 + RECT_LEFT(*a)))
+                dir = OB_DIRECTION_SOUTHWEST;
+            else if (x >= (a->width / -4 + RECT_RIGHT(*a)))
+                dir = OB_DIRECTION_SOUTHEAST;
+            else
+                dir = OB_DIRECTION_SOUTH;
+        }
+
+        /* try check for xinerama boundaries */
+        if ((x + 1 == RECT_LEFT(*a) || x - 1 == RECT_RIGHT(*a)) &&
+            !(dir == OB_DIRECTION_NORTH || dir == OB_DIRECTION_SOUTH))
+        {
+            dir = -1;
+        }
+        if ((y + 1 == RECT_TOP(*a) || y - 1 == RECT_BOTTOM(*a)) &&
+            !(dir == OB_DIRECTION_WEST || dir == OB_DIRECTION_EAST))
+        {
+            dir = -1;
+        }
+    }
+
+    if (dir != edge_action_dir) {
+        cancel_edge_action();
+        if (dir != (ObDirection)-1) {
+            POINT_SET(*(Point *)pt, x, y);
+            edge_action_timer = g_timeout_add_full(G_PRIORITY_DEFAULT,
+                                                   config_mouse_screenedgetime,
+                                                   edge_snap_delay_func, pt,
+                                                   edge_snap_cleanup);
+        }
+        edge_action_dir = dir;
+    }
+}
+
+static void cancel_edge_action(void)
+{
+    if (edge_action_timer) g_source_remove(edge_action_timer);
+    edge_action_timer = 0;
 }
 
 static void move_with_keys(KeySym sym, guint state)
@@ -1012,6 +1130,9 @@ gboolean moveresize_event(XEvent *e)
         if (!button) {
             start_x = e->xbutton.x_root;
             start_y = e->xbutton.y_root;
+            start_cx = moveresize_client->area.x;
+            start_cy = moveresize_client->area.y;
+            resize_x = resize_y = 0;
             button = e->xbutton.button; /* this will end it now */
         }
         used = e->xbutton.button == button;
@@ -1022,11 +1143,12 @@ gboolean moveresize_event(XEvent *e)
         }
     } else if (e->type == MotionNotify) {
         if (moving) {
-            cur_x = start_cx + e->xmotion.x_root - start_x;
-            cur_y = start_cy + e->xmotion.y_root - start_y;
+            cur_x = start_cx + e->xmotion.x_root - start_x + resize_x;
+            cur_y = start_cy + e->xmotion.y_root - start_y + resize_y;
 
-            if (ABS(cur_x - start_x) >= config_resist_edge ||
-                ABS(cur_y - start_y) >= config_resist_edge)
+            if ((ABS(e->xmotion.x_root - start_x) >= config_resist_edge ||
+                 ABS(e->xmotion.y_root - start_y) >= config_resist_edge) &&
+                !edge_action_timer)
             {
                 if (moveresize_client->max_horz) {
                     /* unmax horz */
@@ -1034,8 +1156,10 @@ gboolean moveresize_event(XEvent *e)
                     pre_max_area.x = moveresize_client->pre_max_area.x;
 
                     moveresize_client->pre_max_area.x = cur_x;
-                    start_x = (moveresize_client->pre_max_area.width *
-                               e->xmotion.x_root / moveresize_client->area.width);
+                    resize_x = (int)((float)(moveresize_client->area.width -
+                                moveresize_client->pre_max_area.width) *
+                               (start_x - start_cx) /
+                                moveresize_client->area.width);
 
                     client_maximize(moveresize_client, FALSE, 1);
                     cur_w = moveresize_client->area.width;
@@ -1046,8 +1170,10 @@ gboolean moveresize_event(XEvent *e)
                     pre_max_area.y = moveresize_client->pre_max_area.y;
 
                     moveresize_client->pre_max_area.y = cur_y;
-                    start_y = (moveresize_client->pre_max_area.height *
-                               e->xmotion.y_root / moveresize_client->area.height);
+                    resize_y = (int)((float)(moveresize_client->area.height -
+                                moveresize_client->pre_max_area.height) *
+                               (start_y - start_cy) /
+                                moveresize_client->area.height);
 
                     client_maximize(moveresize_client, FALSE, 2);
                     cur_h = moveresize_client->area.height;
@@ -1059,13 +1185,15 @@ gboolean moveresize_event(XEvent *e)
                     pre_tile_area.y = moveresize_client->pre_tile_area.y;
 
                     moveresize_client->pre_tile_area.x = cur_x;
-                    start_x = (((e->xmotion.x_root - start_cx ) *
-                               moveresize_client->pre_tile_area.width /
-                               moveresize_client->area.width) + start_cx);
+                    resize_x = (int)((float)(moveresize_client->area.width -
+                                moveresize_client->pre_tile_area.width) *
+                               (start_x - start_cx) /
+                                moveresize_client->area.width);
                     moveresize_client->pre_tile_area.y = cur_y;
-                    start_y = (((e->xmotion.y_root - start_cy ) *
-                               moveresize_client->pre_tile_area.height /
-                               moveresize_client->area.height) + start_cy);
+                    resize_y = (int)((float)(moveresize_client->area.height -
+                                moveresize_client->pre_tile_area.height) *
+                               (start_y - start_cy) /
+                                moveresize_client->area.height);
 
                     client_tile(moveresize_client, FALSE,
                                 moveresize_client->tile_dir);
@@ -1073,9 +1201,39 @@ gboolean moveresize_event(XEvent *e)
                     cur_h = moveresize_client->area.height;
                 }
             }
+#if 0 /* this part is great in theory, but doesn't feel good in practice */
+            else {
+                    if (was_max_horz && !moveresize_client->max_horz) {
+                        /* remax horz */
+                        moveresize_client->pre_max_area.x = pre_max_area.x;
+                        client_maximize(moveresize_client, TRUE, 1);
+                        was_max_horz = FALSE;
+                        resize_x = 0;
+                    }
+                    if (was_max_vert && !moveresize_client->max_vert) {
+                        /* remax vert */
+                        moveresize_client->pre_max_area.y = pre_max_area.y;
+                        client_maximize(moveresize_client, TRUE, 2);
+                        was_max_vert = FALSE;
+                        resize_y = 0;
+                    }
+                    if (was_tiled && !moveresize_client->tiled) {
+                        /* retile */
+                        moveresize_client->pre_tile_area.x = pre_tile_area.x;
+                        moveresize_client->pre_tile_area.y = pre_tile_area.y;
+                        client_tile(moveresize_client, TRUE, moveresize_client->tile_dir);
+                        was_tiled = FALSE;
+                        resize_x = resize_x = 0;
+                    }
+            }
+#endif
 
             do_move(FALSE, 0);
-            do_edge_warp(e->xmotion.x_root, e->xmotion.y_root);
+            if (config_mouse_edgeaction == OB_EDGE_ACTION_WARP)
+                do_edge_warp(e->xmotion.x_root, e->xmotion.y_root);
+            else if (config_mouse_edgeaction == OB_EDGE_ACTION_SNAP)
+                do_edge_snap(e->xmotion.x_root, e->xmotion.y_root);
+
         } else {
             gint dw, dh;
             ObDirection dir;
