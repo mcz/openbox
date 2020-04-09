@@ -33,6 +33,12 @@ typedef enum {
     OB_RESIZE_POS_FIXED
 } ObResizePopupPos;
 
+typedef enum {
+    OB_EDGE_ACTION_NONE,
+    OB_EDGE_ACTION_WARP,
+    OB_EDGE_ACTION_SNAP
+} ObEdgeAction;
+
 extern gboolean moveresize_in_progress;
 extern struct _ObClient *moveresize_client;
 #ifdef SYNC

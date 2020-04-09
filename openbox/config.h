@@ -193,6 +193,9 @@ extern gint config_mouse_screenedgetime;
 /*! When TRUE, the mouse is warped to the other side of the desktop after
   switching desktops from bumping the screen edge */
 extern gboolean config_mouse_screenedgewarp;
+/*! What Action to perform when a Window is dragged to the edge of the screen.
+  Can be "None", "Snap" or "Warp". Warp is the default */
+extern ObEdgeAction config_mouse_edgeaction;
 
 /*! Number of pixels to resist while crossing another window's edge */
 extern gint config_resist_win;
