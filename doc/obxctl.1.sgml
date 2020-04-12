@@ -1,0 +1,100 @@
+<!doctype refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+
+<!-- Process this file with docbook-to-man to generate an nroff manual
+     page: `docbook-to-man manpage.sgml > manpage.1'.  You may view
+     the manual page with: `docbook-to-man manpage.sgml | nroff -man |
+     less'.  A typical entry in a Makefile or Makefile.am is:
+
+manpage.1: manpage.sgml
+	docbook-to-man $< > $@
+
+    
+	The docbook-to-man binary is found in the docbook-to-man package.
+	Please remember that if you create the nroff version in one of the
+	debian/rules file targets (such as build), you will need to include
+	docbook-to-man in your Build-Depends control field.
+
+  -->
+
+  <!ENTITY dhsection   "<manvolnum>1</manvolnum>">
+  <!ENTITY dhucpackage "<refentrytitle>OBXCTL</refentrytitle>">
+  <!ENTITY dhpackage   "OBXCTL">
+]>
+
+<refentry>
+  <refmeta>
+    &dhucpackage;
+
+    &dhsection;
+  </refmeta>
+  <refnamediv>
+    <refname>&dhpackage;</refname>
+
+    <refpurpose>Pass actions to openbox. </refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>&dhpackage;</command>
+      <arg choice="Opt">--help</arg>
+      <arg choice="Opt">-d DISPLAY</arg>
+      <arg choice="Opt">--</arg>
+      <arg choice="Opt" rep="Repeat">FILE</arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>DESCRIPTION</title>
+
+    <para>obxctl is a tool that reads XML data from FILE, or STDIN if FILE isn't specified, and passes them on to openbox for execution.</para>
+
+    <para>Internally, it sends an XEvent to the root window, that tells openbox to read from a named pipe located at $XDG_CACHE_HOME/openbox/$DISPLAY. Then it writes the contents of FILE (or STDIN) to the pipe.</para>
+
+  </refsect1>
+  <refsect1>
+    <title>OPTIONS</title>
+
+    <para>These are the possible options that <command>&dhpackage;</command> accepts:</para>
+    <variablelist>
+      <varlistentry>
+        <term><option>--help</option></term>
+        <listitem>
+          <para>Show a summary of the options available.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>-d</option> DISPLAY</term>
+        <listitem>
+          <para>Specify the X display to use.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+
+    <para>Similar to <command>xprop</command>,
+      you may pass one or more property names to have
+      <command>&dhpackage;</command> limit its output to only the properties
+      requested.</para>
+  </refsect1>
+  <refsect1>
+    <title>SEE ALSO</title>
+
+    <para>openbox (1), openbox-session(1), openbox-gnome-session(1),
+      openbox-kde-session(1).</para>
+
+  </refsect1>
+</refentry>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-default-dtd-file:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

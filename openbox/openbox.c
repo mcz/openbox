@@ -21,6 +21,7 @@
 #include "openbox.h"
 #include "session.h"
 #include "dock.h"
+#include "control.h"
 #include "event.h"
 #include "menu.h"
 #include "client.h"
@@ -308,6 +309,7 @@ gint main(gint argc, gchar **argv)
                 }
             }
             event_startup(reconfigure);
+            control_startup(reconfigure);
             /* focus_backup is used for stacking, so this needs to come before
                anything that calls stacking_add */
             sn_startup(reconfigure);
@@ -409,6 +411,7 @@ gint main(gint argc, gchar **argv)
             focus_shutdown(reconfigure);
             window_shutdown(reconfigure);
             sn_shutdown(reconfigure);
+            control_shutdown(reconfigure);
             event_shutdown(reconfigure);
             config_shutdown();
             actions_shutdown(reconfigure);

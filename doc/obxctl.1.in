@@ -1,0 +1,22 @@
+.TH "OBXCTL" "1" 
+.SH "NAME" 
+obxctl \(em Pass actions to openbox. 
+.SH "SYNOPSIS" 
+.PP 
+\fBopenbox\fR [\-\-help]  [\-d DISPLAY] [FILE]  
+.SH "DESCRIPTION" 
+.PP 
+obxctl is a tool that reads XML data from FILE, or STDIN if FILE isn't specified, and passes them on to openbox for execution.
+.PP 
+Internally, it sends an XEvent to the root window, that tells openbox to read from a named pipe located at $XDG_CACHE_HOME/openbox/$DISPLAY. Then it writes the contents of FILE (or STDIN) to the pipe.
+.SH "OPTIONS" 
+.PP 
+These are the possible options that \fBobxctl\fR accepts: 
+.IP "\fB\-\-help\fP" 10 
+Show a summary of the options available. 
+.IP "\fB\-d\fP DISPLAY" 10 
+Specify the X display to use. 
+.SH "SEE ALSO" 
+.PP 
+openbox (1), openbox-session(1), openbox-gnome-session(1), 
+openbox-kde-session(1). 

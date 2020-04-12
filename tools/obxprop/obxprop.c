@@ -347,7 +347,7 @@ int main(int argc, char **argv)
         return fail("Unable to find window with the requested ID");
 
     show_properties(d, id, argc - i, &argv[i]);
-    
+
     XCloseDisplay(d);
 
     return 0;

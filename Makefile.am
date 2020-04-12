@@ -35,6 +35,7 @@ bin_PROGRAMS = \
 	tools/gdm-control/gdm-control \
 	tools/gnome-panel-control/gnome-panel-control \
 	tools/obxprop/obxprop
+	tools/obxctl/obxctl
 
 noinst_PROGRAMS = \
 	obt/obt_unittests
@@ -348,6 +349,17 @@ tools_obxprop_obxprop_LDADD = \
 tools_obxprop_obxprop_SOURCES = \
 	tools/obxprop/obxprop.c
 
+## obxctl ##
+
+tools_obxctl_obxctl_CPPFLAGS = \
+	$(GLIB_CFLAGS) \
+	$(X_CFLAGS)
+tools_obxctl_obxctl_LDADD = \
+	$(GLIB_LIBS) \
+	$(X_LIBS)
+tools_obxctl_obxctl_SOURCES = \
+	tools/obxctl/obxctl.c
+
 ## gdm-control ##
 
 tools_gdm_control_gdm_control_CPPFLAGS = \
@@ -564,6 +576,8 @@ dist_noinst_DATA = \
 	doc/openbox-kde-session.1.in \
 	doc/obxprop.1.sgml \
 	doc/obxprop.1.in \
+	doc/obxctl.1.sgml \
+	doc/obxctl.1.in \
 	obrender/version.h.in \
 	obrender/obrender-3.5.pc.in \
 	obt/obt-3.5.pc.in \
@@ -601,7 +615,8 @@ nodist_man_MANS = \
 	doc/openbox-session.1 \
 	doc/openbox-gnome-session.1 \
 	doc/openbox-kde-session.1 \
-	doc/obxprop.1
+	doc/obxprop.1 \
+	doc/obxctl.1
 
 EXTRA_DIST = \
 	config.rpath
