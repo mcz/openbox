@@ -58,7 +58,6 @@ static gint start_x, start_y, start_cx, start_cy, start_cw, start_ch;
 static gboolean was_max_horz, was_max_vert, was_tiled;
 static Rect pre_max_area, pre_tile_area;
 static gint cur_x, cur_y, cur_w, cur_h;
-static gint resize_x, resize_y;
 static guint button;
 static guint32 corner;
 static ObDirection edge_action_dir = -1;
@@ -241,7 +240,6 @@ void moveresize_start(ObClient *c, gint x, gint y, guint b, guint32 cnr)
     start_cy = c->area.y;
     start_cw = c->area.width;
     start_ch = c->area.height;
-    resize_x = resize_y = 0;
     /* these adjustments for the size_inc make resizing a terminal more
        friendly. you essentially start the resize in the middle of the
        increment instead of at 0, so you have to move half an increment
@@ -698,10 +696,10 @@ static gboolean edge_snap_delay_func(gpointer data)
     client_tile(moveresize_client, TRUE, edge_action_dir);
 
     /* Trust me */
-    x = (int)((float)((((Point *)data)->x - cur_x) * moveresize_client->area.width /
-         moveresize_client->pre_tile_area.width) + moveresize_client->area.x);
-    y = (int)((float)((((Point *)data)->y - cur_y) * moveresize_client->area.height /
-         moveresize_client->pre_tile_area.height) + moveresize_client->area.y);
+    x = (((Point *)data)->x - cur_x) * moveresize_client->area.width /
+         moveresize_client->pre_tile_area.width + moveresize_client->area.x;
+    y = (((Point *)data)->y - cur_y) * moveresize_client->area.height /
+         moveresize_client->pre_tile_area.height + moveresize_client->area.y;
 
     XWarpPointer(obt_display, None, obt_root(ob_screen), 0, 0, 0, 0, x, y);
 
@@ -717,7 +715,6 @@ static gboolean edge_snap_delay_func(gpointer data)
     start_cy = moveresize_client->area.y;
     start_x = x;
     start_y = y;
-    resize_x = resize_y = 0;
 
     return FALSE; /* don't repeat ! */
 }
@@ -1132,7 +1129,6 @@ gboolean moveresize_event(XEvent *e)
             start_y = e->xbutton.y_root;
             start_cx = moveresize_client->area.x;
             start_cy = moveresize_client->area.y;
-            resize_x = resize_y = 0;
             button = e->xbutton.button; /* this will end it now */
         }
         used = e->xbutton.button == button;
@@ -1143,23 +1139,28 @@ gboolean moveresize_event(XEvent *e)
         }
     } else if (e->type == MotionNotify) {
         if (moving) {
-            cur_x = start_cx + e->xmotion.x_root - start_x + resize_x;
-            cur_y = start_cy + e->xmotion.y_root - start_y + resize_y;
+            cur_x = start_cx + e->xmotion.x_root - start_x;
+            cur_y = start_cy + e->xmotion.y_root - start_y;
 
-            if ((ABS(e->xmotion.x_root - start_x) >= config_resist_edge ||
-                 ABS(e->xmotion.y_root - start_y) >= config_resist_edge) &&
-                !edge_action_timer)
+            if (ABS(e->xmotion.x_root - start_x) >= config_resist_edge ||
+                 ABS(e->xmotion.y_root - start_y) >= config_resist_edge)
             {
                 if (moveresize_client->max_horz) {
                     /* unmax horz */
                     was_max_horz = TRUE;
-                    pre_max_area.x = moveresize_client->pre_max_area.x;
 
+                    start_cx = start_x + (start_cx - start_x) *
+                               moveresize_client->pre_max_area.width /
+                               moveresize_client->area.width;
+                    start_cx = (start_cx > start_x) ? start_x :
+                               (start_cx < (start_x -
+                                moveresize_client->pre_max_area.width)) ?
+                               start_x - moveresize_client->pre_max_area.width :
+                               start_cx;
+                    cur_x = start_cx + e->xmotion.x_root - start_x;
+
+                    pre_max_area.x = moveresize_client->pre_max_area.x;
                     moveresize_client->pre_max_area.x = cur_x;
-                    resize_x = (int)((float)(moveresize_client->area.width -
-                                moveresize_client->pre_max_area.width) *
-                               (start_x - start_cx) /
-                                moveresize_client->area.width);
 
                     client_maximize(moveresize_client, FALSE, 1);
                     cur_w = moveresize_client->area.width;
@@ -1167,13 +1168,19 @@ gboolean moveresize_event(XEvent *e)
                 if (moveresize_client->max_vert) {
                     /* unmax vert */
                     was_max_vert = TRUE;
-                    pre_max_area.y = moveresize_client->pre_max_area.y;
 
+                    start_cy = start_y + (start_cy - start_y) *
+                               moveresize_client->pre_max_area.height /
+                               moveresize_client->area.height;
+                    start_cy = (start_cy > start_y) ? start_y :
+                               (start_cy < (start_y -
+                                moveresize_client->pre_max_area.height)) ?
+                               start_y - moveresize_client->pre_max_area.height :
+                               start_cy;
+                    cur_y = start_cy + e->xmotion.y_root - start_y;
+
+                    pre_max_area.y = moveresize_client->pre_max_area.y;
                     moveresize_client->pre_max_area.y = cur_y;
-                    resize_y = (int)((float)(moveresize_client->area.height -
-                                moveresize_client->pre_max_area.height) *
-                               (start_y - start_cy) /
-                                moveresize_client->area.height);
 
                     client_maximize(moveresize_client, FALSE, 2);
                     cur_h = moveresize_client->area.height;
@@ -1181,19 +1188,31 @@ gboolean moveresize_event(XEvent *e)
                 if (moveresize_client->tiled) {
                     /* untile */
                     was_tiled = TRUE;
+
+                    start_cx = start_x + (start_cx - start_x) *
+                               moveresize_client->pre_tile_area.width /
+                               moveresize_client->area.width;
+                    start_cx = (start_cx > start_x) ? start_x :
+                               (start_cx < (start_x -
+                                moveresize_client->pre_tile_area.width)) ?
+                               start_x - moveresize_client->pre_tile_area.width :
+                               start_cx;
+                    cur_x = start_cx + e->xmotion.x_root - start_x;
+
+                    start_cy = start_y + (start_cy - start_y) *
+                               moveresize_client->pre_tile_area.height /
+                               moveresize_client->area.height;
+                    start_cy = (start_cy > start_y) ? start_y :
+                               (start_cy < (start_y -
+                                moveresize_client->pre_tile_area.height)) ?
+                               start_y - moveresize_client->pre_tile_area.height :
+                               start_cy;
+                    cur_y = start_cy + e->xmotion.y_root - start_y;
+
                     pre_tile_area.x = moveresize_client->pre_tile_area.x;
                     pre_tile_area.y = moveresize_client->pre_tile_area.y;
-
                     moveresize_client->pre_tile_area.x = cur_x;
-                    resize_x = (int)((float)(moveresize_client->area.width -
-                                moveresize_client->pre_tile_area.width) *
-                               (start_x - start_cx) /
-                                moveresize_client->area.width);
                     moveresize_client->pre_tile_area.y = cur_y;
-                    resize_y = (int)((float)(moveresize_client->area.height -
-                                moveresize_client->pre_tile_area.height) *
-                               (start_y - start_cy) /
-                                moveresize_client->area.height);
 
                     client_tile(moveresize_client, FALSE,
                                 moveresize_client->tile_dir);
@@ -1208,14 +1227,12 @@ gboolean moveresize_event(XEvent *e)
                         moveresize_client->pre_max_area.x = pre_max_area.x;
                         client_maximize(moveresize_client, TRUE, 1);
                         was_max_horz = FALSE;
-                        resize_x = 0;
                     }
                     if (was_max_vert && !moveresize_client->max_vert) {
                         /* remax vert */
                         moveresize_client->pre_max_area.y = pre_max_area.y;
                         client_maximize(moveresize_client, TRUE, 2);
                         was_max_vert = FALSE;
-                        resize_y = 0;
                     }
                     if (was_tiled && !moveresize_client->tiled) {
                         /* retile */
@@ -1223,7 +1240,6 @@ gboolean moveresize_event(XEvent *e)
                         moveresize_client->pre_tile_area.y = pre_tile_area.y;
                         client_tile(moveresize_client, TRUE, moveresize_client->tile_dir);
                         was_tiled = FALSE;
-                        resize_x = resize_x = 0;
                     }
             }
 #endif
