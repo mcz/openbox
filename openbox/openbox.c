@@ -411,7 +411,6 @@ gint main(gint argc, gchar **argv)
             focus_shutdown(reconfigure);
             window_shutdown(reconfigure);
             sn_shutdown(reconfigure);
-            control_shutdown(reconfigure);
             event_shutdown(reconfigure);
             config_shutdown();
             actions_shutdown(reconfigure);

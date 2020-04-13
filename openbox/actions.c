@@ -255,7 +255,6 @@ ObActionsAct* actions_parse_string(const gchar *name)
                 act->options = act->def->setup.n(NULL);
         }
     }
-                
 
     return act;
 }
@@ -340,8 +339,8 @@ void actions_run_acts(GSList *acts,
     gboolean update_user_time;
 
     /* Don't allow saving the initial state when running things from the
-       menu */
-    if (uact == OB_USER_ACTION_MENU_SELECTION)
+       menu or from obxctl */
+    if (uact == OB_USER_ACTION_MENU_SELECTION || uact == OB_USER_ACTION_OBXCTL)
         state = 0;
     /* If x and y are < 0 then use the current pointer position */
     if (x < 0 && y < 0)

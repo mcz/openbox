@@ -34,7 +34,7 @@ bin_PROGRAMS = \
 	openbox/openbox \
 	tools/gdm-control/gdm-control \
 	tools/gnome-panel-control/gnome-panel-control \
-	tools/obxprop/obxprop
+	tools/obxprop/obxprop \
 	tools/obxctl/obxctl
 
 noinst_PROGRAMS = \
@@ -248,6 +248,8 @@ openbox_openbox_SOURCES = \
 	openbox/client_menu.h \
 	openbox/config.c \
 	openbox/config.h \
+	openbox/control.c \
+	openbox/control.h \
 	openbox/debug.c \
 	openbox/debug.h \
 	openbox/dock.c \

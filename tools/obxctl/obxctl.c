@@ -21,7 +21,7 @@ void send_xevent(Display *d)
 {
     XEvent ce;
     ce.xclient.type = ClientMessage;
-    ce.xclient.message_type = XInternAtom(d, "OBT_PROP_OB_CONTROL", FALSE);
+    ce.xclient.message_type = XInternAtom(d, "_OB_CONTROL", FALSE);
     ce.xclient.display = d;
     ce.xclient.window = DefaultRootWindow(d);
     ce.xclient.format = 32;

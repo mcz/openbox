@@ -39,6 +39,7 @@
 #include "group.h"
 #include "stacking.h"
 #include "ping.h"
+#include "control.h"
 #include "obt/display.h"
 #include "obt/xqueue.h"
 #include "obt/prop.h"
@@ -783,12 +784,16 @@ static void event_handle_root(XEvent *e)
             screen_show_desktop(show_mode, NULL);
         } else if (msgtype == OBT_PROP_ATOM(OB_CONTROL)) {
             ob_debug("OB_CONTROL: %d", e->xclient.data.l[0]);
-            if (e->xclient.data.l[0] == 1)
-                ob_reconfigure();
-            else if (e->xclient.data.l[0] == 2)
-                ob_restart();
-            else if (e->xclient.data.l[0] == 3)
-                ob_exit(0);
+            switch (e->xclient.data.l[0]) {
+            case 1:
+                ob_reconfigure(); break;
+            case 2:
+                ob_restart(); break;
+            case 3:
+                ob_exit(0); break;
+            case 4:
+                control_main(); break;
+            }
         } else if (msgtype == OBT_PROP_ATOM(WM_PROTOCOLS)) {
             if ((Atom)e->xclient.data.l[0] == OBT_PROP_ATOM(NET_WM_PING))
                 ping_got_pong(e->xclient.data.l[1]);
