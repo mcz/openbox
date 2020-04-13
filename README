@@ -21,3 +21,29 @@ Copyright (C) 2002  Dana Jansens
 
     See the COPYING file for a copy of the GNU General Public License.
 
+----
+
+    Hi, I'm mzc and this is my fork of openbox.
+
+    The two main things I've done / am doing are:
+
+    -Areo snap (in the tiling branch). There are still some imprecisions in
+     the pointer location when unsnapping windows, but all in all it's pretty
+     much done.
+
+    -obxctl (in the eponymous branch). This is a command line program that lets
+     you execute actions openbox Actions form the command line, by piping them
+     to obxctl or reading them from a file. The Syntax for the XML is:
+
+        <obxctl>
+          <action name="Something">
+            OPTIONS
+          </action>
+          <action name="SomethingElse"/>
+        </obxctl>
+
+     Or rather, that's the theory. The way openbox knows it s supposed to read
+     from the fifo the XML is getting written to, it gets send an XEvent (just
+     like the one that gets used with "openbox --reconfigure" etc., but with a
+     data.l[0] of 4.
+     For some reason though, this event just doesn't get processed.
