@@ -30,6 +30,16 @@ Copyright (C) 2002  Dana Jansens
     -Areo snap (in the tiling branch). There are still some imprecisions in
      the pointer location when unsnapping windows, but all in all it's pretty
      much done.
+     For this some things in rc.xml are changed:
+
+        -Two new Actions are added, "Tile" and "Untile".
+         Tile take an argument "direction" which can be either one of the 8
+         cardinal directions, wither in full (Northwest, South) or abbreviated
+         (nw, s).
+       -In the mouse section, a new setting was added, "screenEdgeAction".
+        It can be set to None, Warp, or Snap. If not set, it defaults to Warp.
+        screenEdgeWarpTime was renamed to screenEdgeActionTime since it applies
+        to both Warping and Snapping.
 
     -obxctl (in the eponymous branch). This is a command line program that lets
      you execute actions openbox Actions form the command line, by piping them
@@ -41,9 +51,3 @@ Copyright (C) 2002  Dana Jansens
           </action>
           <action name="SomethingElse"/>
         </obxctl>
-
-     Or rather, that's the theory. The way openbox knows it s supposed to read
-     from the fifo the XML is getting written to, it gets send an XEvent (just
-     like the one that gets used with "openbox --reconfigure" etc., but with a
-     data.l[0] of 4.
-     For some reason though, this event just doesn't get processed.
