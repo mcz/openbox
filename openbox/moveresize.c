@@ -735,25 +735,7 @@ static void do_edge_snap(gint x, gint y)
         if (!RECT_CONTAINS(*a, x, y))
             continue;
 
-        if (x == RECT_LEFT(*a)) {
-            if (y <= (a->height / 4 + RECT_TOP(*a)))
-                dir = OB_DIRECTION_NORTHWEST;
-            else if (y >= (a->height / -4 + RECT_BOTTOM(*a)))
-                dir = OB_DIRECTION_SOUTHWEST;
-            else
-                dir = OB_DIRECTION_WEST;
-        }
-
-        else if (x == RECT_RIGHT(*a)) {
-            if (y <= (a->height / 4 + RECT_TOP(*a)))
-                dir = OB_DIRECTION_NORTHEAST;
-            else if (y >= (a->height / -4 + RECT_BOTTOM(*a)))
-                dir = OB_DIRECTION_SOUTHEAST;
-            else
-                dir = OB_DIRECTION_EAST;
-        }
-
-        else if (y == RECT_TOP(*a)) {
+        if (y == RECT_TOP(*a)) {
             if (x <= (a->width / 4 + RECT_LEFT(*a)))
                 dir = OB_DIRECTION_NORTHWEST;
             else if (x >= (a->width / -4 + RECT_RIGHT(*a)))
@@ -761,7 +743,6 @@ static void do_edge_snap(gint x, gint y)
             else
                 dir = OB_DIRECTION_NORTH;
         }
-
         else if (y == RECT_BOTTOM(*a)) {
             if (x <= (a->width / 4 + RECT_LEFT(*a)))
                 dir = OB_DIRECTION_SOUTHWEST;
@@ -770,6 +751,23 @@ static void do_edge_snap(gint x, gint y)
             else
                 dir = OB_DIRECTION_SOUTH;
         }
+        else if (x == RECT_LEFT(*a)) {
+            if (y <= (a->height / 6 + RECT_TOP(*a)))
+                dir = OB_DIRECTION_NORTHWEST;
+            else if (y >= (a->height / -3 + RECT_BOTTOM(*a)))
+                dir = OB_DIRECTION_SOUTHWEST;
+            else
+                dir = OB_DIRECTION_WEST;
+        }
+        else if (x == RECT_RIGHT(*a)) {
+            if (y <= (a->height / 6 + RECT_TOP(*a)))
+                dir = OB_DIRECTION_NORTHEAST;
+            else if (y >= (a->height / -3 + RECT_BOTTOM(*a)))
+                dir = OB_DIRECTION_SOUTHEAST;
+            else
+                dir = OB_DIRECTION_EAST;
+        }
+
 
         /* try check for xinerama boundaries */
         if ((x + 1 == RECT_LEFT(*a) || x - 1 == RECT_RIGHT(*a)) &&
