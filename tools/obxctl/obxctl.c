@@ -4,6 +4,8 @@
 #include <glib.h>
 #include <X11/Xlib.h>
 
+Display *d;
+
 gint fail(const gchar *s) {
     if (s)
         fprintf(stderr, "%s\n", s);
@@ -17,7 +19,7 @@ gint fail(const gchar *s) {
     return 1;
 }
 
-void send_xevent(Display *d)
+void send_xevent(void)
 {
     Window root;
     root = DefaultRootWindow(d);
@@ -40,16 +42,30 @@ void send_xevent(Display *d)
 void send_data(FILE *pipe, FILE *data)
 {
     int c;
+    gboolean event_sent = FALSE;
 
     while ((c = getc(data)) != EOF) {
-        fputc(c, pipe);
+        /* write error, because pipe buffer is full, so send XEvent so
+           openbox starts reading from pipe */
+        if (fputc(c, pipe) == EOF) {
+            if (!event_sent) {
+                send_xevent();
+                event_sent = TRUE;
+                /* try sending the next character every 10 ms for 1 second */
+                for (int i = 0; (fputc(c, pipe) == EOF) && (i < 100); ++i)
+                    g_usleep(10000);
+            } else
+                break;
+        }
     }
+    if (!event_sent)
+        send_xevent();
+
     return;
 }
 
 int main(int argc, char **argv)
 {
-    Display *d;
     FILE *pipe;
     FILE *data;
     data = stdin;
@@ -86,8 +102,6 @@ int main(int argc, char **argv)
                     "Ensure you have permission to connect to the display.");
     }
     dname = XDisplayName(dname);
-
-    send_xevent(d);
 
     const gchar *cache_home = g_get_user_cache_dir();
 

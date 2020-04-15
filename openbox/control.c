@@ -16,16 +16,21 @@
 #  include <sys/types.h>
 #  include <unistd.h>
 #endif
+#ifdef HAVE_FCNTL_H
+#   include <fcntl.h>
+#endif
 #ifdef HAVE_SYS_STAT_H
 #  include <sys/stat.h>
 #endif
 
-static gchar *fifopath;
-gboolean pipe_exists = FALSE;
+int pfd = -1;
 
 void control_startup(gboolean reconfigure)
 {
     if (reconfigure) return;
+
+    gchar * fifopath;
+    gboolean pipe_exists = FALSE;
 
     ObtPaths *paths = obt_paths_new();
     fifopath = g_build_filename(obt_paths_cache_home(paths), "openbox",
@@ -45,6 +50,10 @@ void control_startup(gboolean reconfigure)
     } else
         pipe_exists = TRUE;
 
+    if (pipe_exists)
+        pfd = open(fifopath, (O_RDONLY | O_NONBLOCK));
+
+    g_free(fifopath);
 }
 
 static void control_parse(xmlNodePtr node, GSList **actions)
@@ -63,35 +72,41 @@ static void control_parse(xmlNodePtr node, GSList **actions)
     }
 }
 
-static void control_run(GSList *actions, ObClient *client)
+static void control_run(GSList *actions)
 {
     if (menu_frame_visible)
         menu_frame_hide_all();
     actions_run_acts(actions, OB_USER_ACTION_OBXCTL, 0, -1, -1, 0,
-                     OB_FRAME_CONTEXT_NONE, client);
+                     OB_FRAME_CONTEXT_NONE, focus_client);
 }
 
 void control_main(void)
 {
-    if (!pipe_exists) return;
+    if (!pfd) return;
 
     xmlDocPtr dptr = NULL;
     xmlNodePtr root = NULL;
     GSList *actions = NULL;
-    int pipe;
 
     xmlResetLastError();
 
-    dptr = xmlReadFile(fifopath, NULL, (XML_PARSE_NOBLANKS | XML_PARSE_RECOVER));
+    dptr = xmlReadFd(pfd, "pipe", NULL, (XML_PARSE_NOBLANKS | XML_PARSE_RECOVER));
     xmlXIncludeProcessFlags(dptr, (XML_PARSE_NOBLANKS | XML_PARSE_RECOVER));
 
     if (dptr) {
         root = xmlDocGetRootElement(dptr);
         if (root && !(xmlStrcmp(root->name, "obxctl"))) {
             control_parse(root, &actions);
-            control_run(actions, focus_client);
+            control_run(actions);
             g_slist_free(actions);
         }
         xmlFreeDoc(dptr);
     }
+}
+
+void control_shutdown(gboolean reconfigure)
+{
+    if (reconfigure || !pfd) return;
+
+    close(pfd);
 }
