@@ -47,7 +47,7 @@ void control_startup(gboolean reconfigure)
 
 }
 
-static void control_parse(xmlNodePtr node, GSList *actions)
+static void control_parse(xmlNodePtr node, GSList **actions)
 {
     xmlNodePtr n;
 
@@ -57,7 +57,7 @@ static void control_parse(xmlNodePtr node, GSList *actions)
 
             action = actions_parse(n);
             if (action)
-                actions = g_slist_append(actions, action);
+                *actions = g_slist_append(*actions, action);
             n = obt_xml_find_node(n->next, "action");
         }
     }
@@ -87,8 +87,8 @@ void control_main(void)
 
     if (dptr) {
         root = xmlDocGetRootElement(dptr);
-        if (!(root || (xmlStrcmp(root->name, "obxctl")))) {
-            control_parse(root, actions);
+        if (root && !(xmlStrcmp(root->name, "obxctl"))) {
+            control_parse(root, &actions);
             control_run(actions, focus_client);
             g_slist_free(actions);
         }

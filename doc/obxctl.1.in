@@ -6,7 +6,7 @@ obxctl \(em Pass actions to openbox.
 \fBopenbox\fR [\-\-help]  [\-d DISPLAY] [FILE]  
 .SH "DESCRIPTION" 
 .PP 
-obxctl is a tool that reads XML data from FILE, or STDIN if FILE isn't specified, and passes them on to openbox for execution.
+obxctl is a tool that reads XML data from FILE, or STDIN if no FILE is specified or FILE is \-, and passes them on to openbox for execution.
 .PP 
 Internally, it sends an XEvent to the root window, that tells openbox to read from a named pipe located at $XDG_CACHE_HOME/openbox/$DISPLAY. Then it writes the contents of FILE (or STDIN) to the pipe.
 .SH "OPTIONS" 

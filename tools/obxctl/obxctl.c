@@ -19,18 +19,22 @@ gint fail(const gchar *s) {
 
 void send_xevent(Display *d)
 {
+    Window root;
+    root = DefaultRootWindow(d);
+
     XEvent ce;
     ce.xclient.type = ClientMessage;
     ce.xclient.message_type = XInternAtom(d, "_OB_CONTROL", FALSE);
     ce.xclient.display = d;
-    ce.xclient.window = DefaultRootWindow(d);
+    ce.xclient.window = root;
     ce.xclient.format = 32;
     ce.xclient.data.l[0] = 4;
     ce.xclient.data.l[1] = 0;
     ce.xclient.data.l[2] = 0;
     ce.xclient.data.l[3] = 0;
     ce.xclient.data.l[4] = 0;
-    XSendEvent(d, DefaultRootWindow(d), FALSE, SubstructureNotifyMask | SubstructureRedirectMask, &ce);
+    XSendEvent(d, root, FALSE, (SubstructureNotifyMask | SubstructureRedirectMask), &ce);
+    XSync(d, FALSE);
 }
 
 void send_data(FILE *pipe, FILE *data)
