@@ -524,6 +524,7 @@ static void print_version(void)
     g_print(" 2004   Mikael Magnusson\n");
     g_print(_("Copyright (c)"));
     g_print(" 2002   Dana Jansens\n\n");
+	g_print("modified in 2020 by mcz\n");
     g_print("This program comes with ABSOLUTELY NO WARRANTY.\n");
     g_print("This is free software, and you are welcome to redistribute it\n");
     g_print("under certain conditions. See the file COPYING for details.\n\n");
