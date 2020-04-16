@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include <glib.h>
 #include <X11/Xlib.h>
 
@@ -35,6 +36,16 @@ gint fail(const gchar *s) {
              "    --help              Display this help and exit\n"
              "    --display DISPLAY   Connect to this X display\n");
     return 1;
+}
+
+void empty_pipe(const char *pipepath)
+{
+    FILE *pipe;
+    int c, pfd;
+    pfd = open(pipepath, (O_RDONLY | O_NONBLOCK));
+    pipe = fdopen(pfd, "r");
+    while ((c = getc(pipe) != EOF));
+    fclose(pipe);
 }
 
 void send_xevent(void)
@@ -126,6 +137,7 @@ int main(int argc, char **argv)
     gchar *pipepath;
     pipepath = g_build_filename(cache_home, "openbox", dname, NULL);
 
+    empty_pipe(pipepath);
     if (!(pipe = fopen(pipepath, "w")))
         return fail ("Can't open pipe for writing");
 
