@@ -4,6 +4,8 @@
    Copyright (c) 2006        Mikael Magnusson
    Copyright (c) 2003-2007   Dana Jansens
 
+   modified in 2020 by mcz
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -522,6 +524,7 @@ static void print_version(void)
     g_print(" 2004   Mikael Magnusson\n");
     g_print(_("Copyright (c)"));
     g_print(" 2002   Dana Jansens\n\n");
+	g_print("modified in 2020 by mcz\n");
     g_print("This program comes with ABSOLUTELY NO WARRANTY.\n");
     g_print("This is free software, and you are welcome to redistribute it\n");
     g_print("under certain conditions. See the file COPYING for details.\n\n");
