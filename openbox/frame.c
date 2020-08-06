@@ -110,6 +110,8 @@ ObFrame *frame_new(ObClient *client)
     }
     self->window = createWindow(obt_root(ob_screen), visual,
                                 mask, &attrib);
+    if (!client_normal(client))
+        XSetWindowBackgroundPixmap(obt_display, self->window, ParentRelative);
 
     /* create the visible decor windows */
 
