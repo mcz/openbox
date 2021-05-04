@@ -12,7 +12,7 @@ void action_shadelowerraise_startup()
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func_sl(ObActionsData *data, gpointer options)
+static gboolean run_func_sl(ObActionsData *data, G_GNUC_UNUSED gpointer options)
 {
     if (data->client) {
         actions_client_move(data, TRUE);
@@ -26,7 +26,7 @@ static gboolean run_func_sl(ObActionsData *data, gpointer options)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func_ur(ObActionsData *data, gpointer options)
+static gboolean run_func_ur(ObActionsData *data, G_GNUC_UNUSED gpointer options)
 {
     if (data->client) {
         actions_client_move(data, TRUE);

@@ -285,7 +285,7 @@ static gboolean place_under_mouse(ObClient *client, gint *x, gint *y,
     return TRUE;
 }
 
-static gboolean place_per_app_setting_position(ObClient *client, Rect *screen,
+static gboolean place_per_app_setting_position(Rect *screen,
                                                gint *x, gint *y,
                                                ObAppSettings *settings,
                                                Size frame_size)
@@ -301,7 +301,7 @@ static gboolean place_per_app_setting_position(ObClient *client, Rect *screen,
     return TRUE;
 }
 
-static void place_per_app_setting_size(ObClient *client, Rect *screen,
+static void place_per_app_setting_size(Rect *screen,
                                        gint *w, gint *h,
                                        ObAppSettings *settings)
 {
@@ -471,7 +471,7 @@ static gboolean should_set_client_position(ObClient *client,
 gboolean place_client(ObClient *client, gboolean client_to_be_foregrounded,
                       Rect* client_area, ObAppSettings *settings)
 {
-    gboolean ret;
+	gboolean ret;
     Rect *monitor_area;
     int *x, *y, *w, *h;
     Size frame_size;
@@ -480,7 +480,7 @@ gboolean place_client(ObClient *client, gboolean client_to_be_foregrounded,
 
     w = &client_area->width;
     h = &client_area->height;
-    place_per_app_setting_size(client, monitor_area, w, h, settings);
+    place_per_app_setting_size(monitor_area, w, h, settings);
 
     if (!should_set_client_position(client, settings))
         return FALSE;
@@ -492,12 +492,11 @@ gboolean place_client(ObClient *client, gboolean client_to_be_foregrounded,
              *w + client->frame->size.left + client->frame->size.right,
              *h + client->frame->size.top + client->frame->size.bottom);
 
-    ret =
-        place_per_app_setting_position(client, monitor_area, x, y, settings,
-                                       frame_size) ||
-        place_transient_splash(client, monitor_area, x, y, frame_size) ||
-        place_under_mouse(client, x, y, frame_size) ||
-        place_least_overlap(client, monitor_area, x, y, frame_size);
+    ret = place_per_app_setting_position(monitor_area, x, y, settings,
+                                         frame_size) ||
+          place_transient_splash(client, monitor_area, x, y, frame_size) ||
+          place_under_mouse(client, x, y, frame_size) ||
+          place_least_overlap(client, monitor_area, x, y, frame_size);
     g_assert(ret);
 
     g_slice_free(Rect, monitor_area);

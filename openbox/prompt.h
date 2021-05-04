@@ -30,7 +30,7 @@ typedef struct _ObPrompt       ObPrompt;
 typedef struct _ObPromptElement ObPromptElement;
 typedef struct _ObPromptAnswer ObPromptAnswer;
 
-typedef gboolean (*ObPromptCallback)(ObPrompt *p, gint result, gpointer data);
+typedef gboolean (*ObPromptCallback)(gint result, gpointer data);
 typedef void (*ObPromptCleanup)(ObPrompt *p, gpointer data);
 
 struct _ObPromptElement {

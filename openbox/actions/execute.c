@@ -25,7 +25,7 @@ static gpointer setup_func(xmlNodePtr node);
 static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 static void shutdown_func(void);
-static void client_dest(ObClient *client, gpointer data);
+static void client_dest(ObClient *client);
 
 static GSList *prompt_opts = NULL;
 
@@ -35,10 +35,10 @@ void action_execute_startup(void)
     actions_set_shutdown("Execute", shutdown_func);
     actions_set_modifies_focused_window("Execute", FALSE);
 
-    client_add_destroy_notify(client_dest, NULL);
+    client_add_destroy_notify(client_dest);
 }
 
-static void client_dest(ObClient *client, gpointer data)
+static void client_dest(ObClient *client)
 {
     GSList *it;
 
@@ -117,7 +117,7 @@ static Options* dup_options(Options *in, ObActionsData *data)
     return o;
 }
 
-static gboolean prompt_cb(ObPrompt *p, gint result, gpointer options)
+static gboolean prompt_cb(gint result, gpointer options)
 {
     Options *o = options;
     if (result)

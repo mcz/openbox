@@ -225,7 +225,7 @@ static gpointer setup_follow(xmlNodePtr node)
     return o;
 }
 
-static gpointer setup_go_last_func(xmlNodePtr node)
+static gpointer setup_go_last_func(G_GNUC_UNUSED xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
     o->type = LAST;

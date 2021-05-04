@@ -31,8 +31,8 @@ struct _ObActionsAct;
 
 extern KeyBindingTree *keyboard_firstnode;
 
-void keyboard_startup(gboolean reconfig);
-void keyboard_shutdown(gboolean reconfig);
+void keyboard_startup(void);
+void keyboard_shutdown(void);
 
 void keyboard_rebind(void);
 

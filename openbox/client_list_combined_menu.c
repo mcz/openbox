@@ -37,12 +37,12 @@ static ObMenu *combined_menu;
 #define ADD_DESKTOP -2
 #define REMOVE_DESKTOP -3
 
-static void self_cleanup(ObMenu *menu, gpointer data)
+static void self_cleanup(ObMenu *menu, G_GNUC_UNUSED gpointer data)
 {
     menu_clear_entries(menu);
 }
 
-static gboolean self_update(ObMenuFrame *frame, gpointer data)
+static gboolean self_update(ObMenuFrame *frame, G_GNUC_UNUSED gpointer data)
 {
     ObMenu *menu = frame->menu;
     ObMenuEntry *e;
@@ -106,8 +106,8 @@ static gboolean self_update(ObMenuFrame *frame, gpointer data)
     return TRUE; /* always show the menu */
 }
 
-static void menu_execute(ObMenuEntry *self, ObMenuFrame *f,
-                         ObClient *c, guint state, gpointer data)
+static void menu_execute(ObMenuEntry *self, G_GNUC_UNUSED ObMenuFrame *f,
+                         G_GNUC_UNUSED ObClient *c, guint state, G_GNUC_UNUSED gpointer data)
 {
     if (self->id == ADD_DESKTOP) {
         screen_add_desktop(FALSE);
@@ -133,7 +133,7 @@ static void menu_execute(ObMenuEntry *self, ObMenuFrame *f,
     }
 }
 
-static void client_dest(ObClient *client, gpointer data)
+static void client_dest(ObClient *client)
 {
     /* This concise function removes all references to a closed
      * client in the client_list_menu, so we don't have to check
@@ -152,7 +152,7 @@ static void client_dest(ObClient *client, gpointer data)
 void client_list_combined_menu_startup(gboolean reconfig)
 {
     if (!reconfig)
-        client_add_destroy_notify(client_dest, NULL);
+        client_add_destroy_notify(client_dest);
 
     combined_menu = menu_new(MENU_NAME, _("Windows"), TRUE, NULL);
     menu_set_update_func(combined_menu, self_update);

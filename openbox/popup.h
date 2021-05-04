@@ -97,7 +97,6 @@ void popup_min_width(ObPopup *self, gint minw);
 void popup_max_width(ObPopup *self, gint maxw);
 void popup_text_width(ObPopup *self, gint w);
 void popup_text_width_to_string(ObPopup *self, gchar *text);
-void popup_height_to_string(ObPopup *self, gchar *text);
 void popup_text_width_to_strings(ObPopup *self, gchar **strings, gint num);
 
 void popup_set_text_align(ObPopup *self, RrJustify align);

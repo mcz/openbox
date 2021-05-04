@@ -50,7 +50,6 @@ static gboolean flash_timeout(gpointer data);
 
 static void layout_title(ObFrame *self);
 static void set_theme_statics(ObFrame *self);
-static void free_theme_statics(ObFrame *self);
 static gboolean frame_animate_iconify(gpointer self);
 static void frame_adjust_cursors(ObFrame *self);
 
@@ -224,14 +223,8 @@ static void set_theme_statics(ObFrame *self)
                   ob_rr_theme->paddingx + 1, ob_rr_theme->title_height);
 }
 
-static void free_theme_statics(ObFrame *self)
-{
-}
-
 void frame_free(ObFrame *self)
 {
-    free_theme_statics(self);
-
     XDestroyWindow(obt_display, self->window);
     if (self->colormap)
         XFreeColormap(obt_display, self->colormap);
@@ -269,7 +262,6 @@ void frame_hide(ObFrame *self)
 
 void frame_adjust_theme(ObFrame *self)
 {
-    free_theme_statics(self);
     set_theme_statics(self);
 }
 

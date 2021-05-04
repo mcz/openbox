@@ -356,7 +356,7 @@ static void parse_single_per_app_settings(xmlNodePtr app,
    the monitor, so <position><x>center</x></position><monitor>2</monitor>
    will center the window on the second monitor.
 */
-static void parse_per_app_settings(xmlNodePtr node, gpointer d)
+static void parse_per_app_settings(xmlNodePtr node, G_GNUC_UNUSED gpointer d)
 {
     xmlNodePtr app = obt_xml_find_node(node->children, "application");
     for (; app; app = obt_xml_find_node(app->next, "application")) {
@@ -485,7 +485,7 @@ static void parse_key(xmlNodePtr node, GList *keylist)
     g_free(keystring);
 }
 
-static void parse_keyboard(xmlNodePtr node, gpointer d)
+static void parse_keyboard(xmlNodePtr node, G_GNUC_UNUSED gpointer d)
 {
     xmlNodePtr n;
     gchar *key;
@@ -519,7 +519,7 @@ static void parse_keyboard(xmlNodePtr node, gpointer d)
 
 */
 
-static void parse_mouse(xmlNodePtr node, gpointer d)
+static void parse_mouse(xmlNodePtr node, G_GNUC_UNUSED gpointer d)
 {
     xmlNodePtr n, nbut, nact;
     gchar *buttonstr;
@@ -615,7 +615,7 @@ static void parse_mouse(xmlNodePtr node, gpointer d)
     }
 }
 
-static void parse_focus(xmlNodePtr node, gpointer d)
+static void parse_focus(xmlNodePtr node, G_GNUC_UNUSED gpointer d)
 {
     xmlNodePtr n;
 
@@ -637,7 +637,7 @@ static void parse_focus(xmlNodePtr node, gpointer d)
         config_unfocus_leave = obt_xml_node_bool(n);
 }
 
-static void parse_placement(xmlNodePtr node, gpointer d)
+static void parse_placement(xmlNodePtr node, G_GNUC_UNUSED gpointer d)
 {
     xmlNodePtr n;
 
@@ -667,7 +667,7 @@ static void parse_placement(xmlNodePtr node, gpointer d)
     }
 }
 
-static void parse_margins(xmlNodePtr node, gpointer d)
+static void parse_margins(xmlNodePtr node, G_GNUC_UNUSED gpointer d)
 {
     xmlNodePtr n;
 
@@ -683,7 +683,7 @@ static void parse_margins(xmlNodePtr node, gpointer d)
         config_margins.bottom = MAX(0, obt_xml_node_int(n));
 }
 
-static void parse_theme(xmlNodePtr node, gpointer d)
+static void parse_theme(xmlNodePtr node, G_GNUC_UNUSED gpointer d)
 {
     xmlNodePtr n;
 
@@ -776,7 +776,7 @@ static void parse_theme(xmlNodePtr node, gpointer d)
     }
 }
 
-static void parse_desktops(xmlNodePtr node, gpointer d)
+static void parse_desktops(xmlNodePtr node, G_GNUC_UNUSED gpointer d)
 {
     xmlNodePtr n;
 
@@ -814,7 +814,7 @@ static void parse_desktops(xmlNodePtr node, gpointer d)
         config_desktop_popup_time = obt_xml_node_int(n);
 }
 
-static void parse_resize(xmlNodePtr node, gpointer d)
+static void parse_resize(xmlNodePtr node, G_GNUC_UNUSED gpointer d)
 {
     xmlNodePtr n;
 
@@ -858,7 +858,7 @@ static void parse_resize(xmlNodePtr node, gpointer d)
     }
 }
 
-static void parse_dock(xmlNodePtr node, gpointer d)
+static void parse_dock(xmlNodePtr node, G_GNUC_UNUSED gpointer d)
 {
     xmlNodePtr n;
 
@@ -934,7 +934,7 @@ static void parse_dock(xmlNodePtr node, gpointer d)
     }
 }
 
-static void parse_menu(xmlNodePtr node, gpointer d)
+static void parse_menu(xmlNodePtr node, G_GNUC_UNUSED gpointer d)
 {
     xmlNodePtr n;
     node = node->children;
@@ -968,7 +968,7 @@ static void parse_menu(xmlNodePtr node, gpointer d)
     }
 }
 
-static void parse_resistance(xmlNodePtr node, gpointer d)
+static void parse_resistance(xmlNodePtr node, G_GNUC_UNUSED gpointer d)
 {
     xmlNodePtr n;
 

@@ -599,7 +599,7 @@ static void screen_fallback_focus(void)
     }
 }
 
-static gboolean last_desktop_func(gpointer data)
+static gboolean last_desktop_func(G_GNUC_UNUSED gpointer data)
 {
     screen_desktop_timeout = TRUE;
     screen_desktop_timer = 0;
@@ -908,6 +908,7 @@ static guint translate_row_col(guint r, guint c)
                 (screen_desktop_layout.columns - 1 -
                  c % screen_desktop_layout.columns);
         }
+        g_assert_not_reached();
     case OB_ORIENTATION_VERT:
         switch (screen_desktop_layout.start_corner) {
         case OB_CORNER_TOPLEFT:
@@ -936,7 +937,7 @@ static guint translate_row_col(guint r, guint c)
     return 0;
 }
 
-static gboolean hide_desktop_popup_func(gpointer data)
+static gboolean hide_desktop_popup_func(G_GNUC_UNUSED gpointer data)
 {
     pager_popup_hide(desktop_popup);
     desktop_popup_timer = 0;

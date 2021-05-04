@@ -27,31 +27,15 @@ static void RrPseudoColorSetup (RrInstance *inst);
 
 #ifdef DEBUG
 #include "color.h"
-#endif
 static void
 dest(gpointer data)
 {
-#ifdef DEBUG
     RrColor *c = data;
     if (c->refcount > 0)
         g_error("color %d (%d,%d,%d) in hash table with %d "
                 "leftover references",
                 c->id, RrColorRed(c), RrColorGreen(c), RrColorBlue(c),
                 c->refcount);
-#endif
-}
-
-#if 0
-static void f(gpointer key, gpointer value, gpointer n)
-{
-    RrColor *c = value;
-    if (c->id == *(gint*)n)
-        g_message("color %d has %d references", c->id, c->refcount);
-}
-
-void print_refs(gint id)
-{
-    g_hash_table_foreach(RrColorHash(definst), f, &id);
 }
 #endif
 
@@ -68,8 +52,12 @@ RrInstance* RrInstanceNew (Display *display, gint screen)
 
     definst->pseudo_colors = NULL;
 
+#ifdef DEBUG
     definst->color_hash = g_hash_table_new_full(g_int_hash, g_int_equal,
                                                 NULL, dest);
+#else
+    definst->color_hash = g_hash_table_new(g_int_hash, g_int_equal);
+#endif
 
     switch (definst->visual->class) {
     case TrueColor:

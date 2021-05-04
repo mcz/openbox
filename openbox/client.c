@@ -66,7 +66,6 @@
 typedef struct
 {
     ObClientCallback func;
-    gpointer data;
 } ClientCallback;
 
 GList          *client_list             = NULL;
@@ -140,15 +139,14 @@ static void client_call_notifies(ObClient *self, GSList *list)
 
     for (it = list; it; it = g_slist_next(it)) {
         ClientCallback *d = it->data;
-        d->func(self, d->data);
+        d->func(self);
     }
 }
 
-void client_add_destroy_notify(ObClientCallback func, gpointer data)
+void client_add_destroy_notify(ObClientCallback func)
 {
     ClientCallback *d = g_slice_new(ClientCallback);
     d->func = func;
-    d->data = data;
     client_destroy_notifies = g_slist_prepend(client_destroy_notifies, d);
 }
 
@@ -159,21 +157,6 @@ void client_remove_destroy_notify(ObClientCallback func)
     for (it = client_destroy_notifies; it; it = g_slist_next(it)) {
         ClientCallback *d = it->data;
         if (d->func == func) {
-            g_slice_free(ClientCallback, d);
-            client_destroy_notifies =
-                g_slist_delete_link(client_destroy_notifies, it);
-            break;
-        }
-    }
-}
-
-void client_remove_destroy_notify_data(ObClientCallback func, gpointer data)
-{
-    GSList *it;
-
-    for (it = client_destroy_notifies; it; it = g_slist_next(it)) {
-        ClientCallback *d = it->data;
-        if (d->func == func && d->data == data) {
             g_slice_free(ClientCallback, d);
             client_destroy_notifies =
                 g_slist_delete_link(client_destroy_notifies, it);
@@ -3609,7 +3592,7 @@ void client_close(ObClient *self)
 #define OB_KILL_RESULT_NO 0
 #define OB_KILL_RESULT_YES 1
 
-static gboolean client_kill_requested(ObPrompt *p, gint result, gpointer data)
+static gboolean client_kill_requested(gint result, gpointer data)
 {
     ObClient *self = data;
 

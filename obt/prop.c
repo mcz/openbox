@@ -438,7 +438,7 @@ static void* convert_text_property(XTextProperty *tprop,
                    which we must explicitly exclude, as the g_convert function
                    will happily take them.
                 */
-                const register guchar c = (guchar)*p; /* unsigned value at p */
+                register const guchar c = (guchar)*p; /* unsigned value at p */
                 if ((c < 32 && c != 9 && c != 10) || (c >= 127 && c <= 160))
                     break; /* found a control character that isn't allowed */
 

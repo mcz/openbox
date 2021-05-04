@@ -80,12 +80,12 @@ typedef struct
     gulong end;   /* inclusive */
 } ObSerialRange;
 
-static void event_process(const XEvent *e, gpointer data);
+static void event_process(const XEvent *e);
 static void event_handle_root(XEvent *e);
 static gboolean event_handle_menu_input(XEvent *e);
-static void event_handle_menu(ObMenuFrame *frame, XEvent *e);
+static void event_handle_menu(XEvent *e);
 static gboolean event_handle_prompt(ObPrompt *p, XEvent *e);
-static void event_handle_dock(ObDock *s, XEvent *e);
+static void event_handle_dock(XEvent *e);
 static void event_handle_dockapp(ObDockApp *app, XEvent *e);
 static void event_handle_client(ObClient *c, XEvent *e);
 static gboolean event_handle_user_input(ObClient *client, XEvent *e);
@@ -96,7 +96,7 @@ static void focus_delay_dest(gpointer data);
 static void unfocus_delay_dest(gpointer data);
 static gboolean focus_delay_func(gpointer data);
 static gboolean unfocus_delay_func(gpointer data);
-static void focus_delay_client_dest(ObClient *client, gpointer data);
+static void focus_delay_client_dest(ObClient *client);
 
 Time event_last_user_time = CurrentTime;
 
@@ -118,16 +118,16 @@ static guint unfocus_delay_timeout_id = 0;
 static ObClient *unfocus_delay_timeout_client = NULL;
 
 #ifdef USE_SM
-static gboolean ice_handler(GIOChannel *source, GIOCondition cond,
-                            gpointer conn)
+static gboolean ice_handler(G_GNUC_UNUSED GIOChannel *source,
+                            G_GNUC_UNUSED GIOCondition cond, gpointer conn)
 {
     Bool b;
     IceProcessMessages(conn, NULL, &b);
     return TRUE; /* don't remove the event source */
 }
 
-static void ice_watch(IceConn conn, IcePointer data, Bool opening,
-                      IcePointer *watch_data)
+static void ice_watch(IceConn conn, G_GNUC_UNUSED IcePointer data, Bool opening,
+                      G_GNUC_UNUSED IcePointer *watch_data)
 {
     static guint id = 0;
 
@@ -148,13 +148,13 @@ void event_startup(gboolean reconfig)
 {
     if (reconfig) return;
 
-    xqueue_add_callback(event_process, NULL);
+    xqueue_add_callback(event_process);
 
 #ifdef USE_SM
     IceAddConnectionWatch(ice_watch, NULL);
 #endif
 
-    client_add_destroy_notify(focus_delay_client_dest, NULL);
+    client_add_destroy_notify(focus_delay_client_dest);
 }
 
 void event_shutdown(gboolean reconfig)
@@ -400,12 +400,12 @@ static gboolean wanted_focusevent(XEvent *e, gboolean in_client_only)
     }
 }
 
-static gboolean event_look_for_focusin(XEvent *e, gpointer data)
+static gboolean event_look_for_focusin(XEvent *e, G_GNUC_UNUSED gpointer data)
 {
     return e->type == FocusIn && wanted_focusevent(e, FALSE);
 }
 
-static gboolean event_look_for_focusin_client(XEvent *e, gpointer data)
+static gboolean event_look_for_focusin_client(XEvent *e, G_GNUC_UNUSED gpointer data)
 {
     return e->type == FocusIn && wanted_focusevent(e, TRUE);
 }
@@ -448,7 +448,7 @@ static void print_focusevent(XEvent *e)
 
 }
 
-static void event_process(const XEvent *ec, gpointer data)
+static void event_process(const XEvent *ec)
 {
     XEvent ee, *e;
     Window window;
@@ -627,9 +627,9 @@ static void event_process(const XEvent *ec, gpointer data)
     else if (dockapp)
         event_handle_dockapp(dockapp, e);
     else if (dock)
-        event_handle_dock(dock, e);
+        event_handle_dock(e);
     else if (menu)
-        event_handle_menu(menu, e);
+        event_handle_menu(e);
     else if (window == obt_root(ob_screen))
         event_handle_root(e);
     else if (e->type == MapRequest)
@@ -988,6 +988,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
             pcon = mouse_button_frame_context(pcon, e->xbutton.button,
                                               e->xbutton.state);
         }
+        G_GNUC_FALLTHROUGH;
     case ButtonRelease:
         /* Wheel buttons don't draw because they are an instant click, so it
            is a waste of resources to go drawing it.
@@ -1746,7 +1747,7 @@ static void event_handle_client(ObClient *client, XEvent *e)
     }
 }
 
-static void event_handle_dock(ObDock *s, XEvent *e)
+static void event_handle_dock(XEvent *e)
 {
     switch (e->type) {
     case EnterNotify:
@@ -1936,8 +1937,7 @@ static gboolean event_handle_menu_input(XEvent *ev)
             /* keyboard accelerator shortcuts. (if it was a valid key) */
             else if (frame->entries &&
                      (unikey =
-                      obt_keyboard_keypress_to_unichar(menu_frame_ic(frame),
-                                                       ev)))
+                      obt_keyboard_keypress_to_unichar(menu_frame_ic(), ev)))
             {
                 GList *start;
                 GList *it;
@@ -2019,7 +2019,7 @@ static gboolean event_look_for_menu_enter(XEvent *ev, gpointer data)
         e->frame == f && !e->ignore_enters;
 }
 
-static void event_handle_menu(ObMenuFrame *frame, XEvent *ev)
+static void event_handle_menu(XEvent *ev)
 {
     ObMenuFrame *f;
     ObMenuEntryFrame *e;
@@ -2145,7 +2145,7 @@ static gboolean unfocus_delay_func(gpointer data)
     return FALSE; /* no repeat */
 }
 
-static void focus_delay_client_dest(ObClient *client, gpointer data)
+static void focus_delay_client_dest(ObClient *client)
 {
     if (focus_delay_timeout_client == client && focus_delay_timeout_id)
         g_source_remove(focus_delay_timeout_id);
@@ -2267,7 +2267,7 @@ gboolean event_time_after(guint32 t1, guint32 t2)
         return t1 >= t2 && t1 < (t2 + TIME_HALF);
 }
 
-gboolean find_timestamp(XEvent *e, gpointer data)
+gboolean find_timestamp(XEvent *e, G_GNUC_UNUSED gpointer data)
 {
     const Time t = event_get_timestamp(e);
     if (t && t >= event_curtime) {

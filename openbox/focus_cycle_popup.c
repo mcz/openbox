@@ -115,7 +115,7 @@ static Window create_window(Window parent, guint bwidth, gulong mask,
                          RrVisual(ob_rr_inst), mask, attr);
 }
 
-void focus_cycle_popup_startup(gboolean reconfig)
+void focus_cycle_popup_startup(void)
 {
     XSetWindowAttributes attrib;
     RrPixel32 *p;
@@ -207,7 +207,7 @@ void focus_cycle_popup_startup(gboolean reconfig)
     window_add(&popup.bg, INTERNAL_AS_WINDOW(&popup));
 }
 
-void focus_cycle_popup_shutdown(gboolean reconfig)
+void focus_cycle_popup_shutdown(void)
 {
     icon_popup_free(single_popup);
 

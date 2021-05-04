@@ -248,6 +248,7 @@ static void swap_byte_order(XImage *im)
                 t = c[2];
                 c[2] = c[3];
                 c[3] = t;
+                G_GNUC_FALLTHROUGH;
             case 16:
                 t = c[0];
                 c[0] = c[1];

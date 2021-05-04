@@ -65,7 +65,7 @@ static Window createWindow(Window parent, gulong mask,
                          RrVisual(ob_rr_inst), mask, attrib);
 }
 
-static void client_dest(ObClient *client, gpointer data)
+static void client_dest(G_GNUC_UNUSED ObClient *client)
 {
     GList *it;
 
@@ -92,7 +92,7 @@ void menu_frame_startup(gboolean reconfig)
 
     if (reconfig) return;
 
-    client_add_destroy_notify(client_dest, NULL);
+    client_add_destroy_notify(client_dest);
     menu_frame_map = g_hash_table_new(g_int_hash, g_int_equal);
 }
 
@@ -158,7 +158,7 @@ void menu_frame_free(ObMenuFrame *self)
     }
 }
 
-ObtIC* menu_frame_ic(ObMenuFrame *self)
+ObtIC* menu_frame_ic(void)
 {
     /* menus are always used through a grab right now, so they can always use
        the grab input context */
@@ -1033,7 +1033,7 @@ gboolean menu_frame_show_topmenu(ObMenuFrame *self, const GravityPoint *pos,
 /*! Stop hiding an open submenu.
     @child The OnMenuFrame of the submenu to be hidden
 */
-static void remove_submenu_hide_timeout(ObMenuFrame *child)
+static void remove_submenu_hide_timeout(G_GNUC_UNUSED ObMenuFrame *child)
 {
     if (submenu_hide_timer) g_source_remove(submenu_hide_timer);
 }
@@ -1185,7 +1185,7 @@ static gboolean submenu_show_timeout(gpointer data)
     return FALSE;
 }
 
-static void submenu_show_dest(gpointer data)
+static void submenu_show_dest(G_GNUC_UNUSED gpointer data)
 {
     submenu_show_timer = 0;
 }
@@ -1197,7 +1197,7 @@ static gboolean submenu_hide_timeout(gpointer data)
     return FALSE;
 }
 
-static void submenu_hide_dest(gpointer data)
+static void submenu_hide_dest(G_GNUC_UNUSED gpointer data)
 {
     submenu_hide_timer = 0;
 }

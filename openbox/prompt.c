@@ -567,12 +567,12 @@ void prompt_cancel(ObPrompt *self)
     prompt_run_callback(self, self->cancel_result);
 }
 
-static gboolean prompt_show_message_cb(ObPrompt *p, int res, gpointer data)
+static gboolean prompt_show_message_cb(G_GNUC_UNUSED int res, G_GNUC_UNUSED gpointer data)
 {
     return TRUE; /* call the cleanup func */
 }
 
-static void prompt_show_message_cleanup(ObPrompt *p, gpointer data)
+static void prompt_show_message_cleanup(ObPrompt *p, G_GNUC_UNUSED gpointer data)
 {
     prompt_unref(p);
 }
@@ -595,7 +595,7 @@ static void prompt_run_callback(ObPrompt *self, gint result)
 {
     prompt_ref(self);
     if (self->func) {
-        gboolean clean = self->func(self, result, self->data);
+        gboolean clean = self->func(result, self->data);
         if (clean && self->cleanup)
             self->cleanup(self, self->data);
     }

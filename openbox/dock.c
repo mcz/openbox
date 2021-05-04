@@ -626,7 +626,7 @@ void dock_app_drag(ObDockApp *app, XMotionEvent *e)
     dock_configure();
 }
 
-static gboolean hide_timeout(gpointer data)
+static gboolean hide_timeout(G_GNUC_UNUSED gpointer data)
 {
     /* hide */
     dock->hidden = TRUE;
@@ -635,7 +635,7 @@ static gboolean hide_timeout(gpointer data)
     return FALSE; /* don't repeat */
 }
 
-static gboolean show_timeout(gpointer data)
+static gboolean show_timeout(G_GNUC_UNUSED gpointer data)
 {
     /* show */
     dock->hidden = FALSE;

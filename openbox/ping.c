@@ -41,7 +41,7 @@ static guint32     ping_next_id = 1;
 #define PING_TIMEOUT_WARN 2
 
 static void     ping_send(ObPingTarget *t);
-static void     ping_end(ObClient *client, gpointer data);
+static void     ping_end(ObClient *client);
 static gboolean ping_timeout(gpointer data);
 static gboolean find_client(gpointer key, gpointer value, gpointer client);
 
@@ -52,7 +52,7 @@ void ping_startup(gboolean reconfigure)
     ping_ids = g_hash_table_new(g_int_hash, g_int_equal);
 
     /* listen for clients to disappear */
-    client_add_destroy_notify(ping_end, NULL);
+    client_add_destroy_notify(ping_end);
 }
 
 void ping_shutdown(gboolean reconfigure)
@@ -104,13 +104,13 @@ void ping_got_pong(guint32 id)
         t->waiting = 0; /* not waiting for a reply anymore */
 
         /* we got a pong so we're happy now */
-        ping_end(t->client, NULL);
+        ping_end(t->client);
     }
     else
         ob_debug("Got PONG with id %u but not waiting for one", id);
 }
 
-static gboolean find_client(gpointer key, gpointer value, gpointer client)
+static gboolean find_client(G_GNUC_UNUSED gpointer key, gpointer value, gpointer client)
 {
     ObPingTarget *t = value;
     return t->client == client;
@@ -151,7 +151,7 @@ static gboolean ping_timeout(gpointer data)
     return TRUE; /* repeat */
 }
 
-static void ping_end(ObClient *client, gpointer data)
+static void ping_end(ObClient *client)
 {
     ObPingTarget *t;
 

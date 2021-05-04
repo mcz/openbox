@@ -31,9 +31,6 @@ struct _ObClient;
 /*! The client which appears focused during a focus cycle operation */
 extern struct _ObClient *focus_cycle_target;
 
-void focus_cycle_startup(gboolean reconfig);
-void focus_cycle_shutdown(gboolean reconfig);
-
 /*! Cycle focus amongst windows. */
 struct _ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
                               gboolean nonhilite_windows,

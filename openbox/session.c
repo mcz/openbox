@@ -407,8 +407,9 @@ static void sm_save_yourself_2(SmcConn conn, SmPointer data)
     SmcSaveYourselfDone(conn, success);
 }
 
-static void sm_save_yourself(SmcConn conn, SmPointer data, gint save_type,
-                             Bool shutdown, gint interact_style, Bool fast)
+static void sm_save_yourself(SmcConn conn, G_GNUC_UNUSED SmPointer data,
+                             gint save_type, G_GNUC_UNUSED Bool shutdown,
+                             G_GNUC_UNUSED gint interact_style, G_GNUC_UNUSED Bool fast)
 {
     ObSMSaveData *savedata = NULL;
     gchar *vendor;
@@ -448,18 +449,18 @@ static void sm_save_yourself(SmcConn conn, SmPointer data, gint save_type,
     }
 }
 
-static void sm_die(SmcConn conn, SmPointer data)
+static void sm_die(G_GNUC_UNUSED SmcConn conn, G_GNUC_UNUSED SmPointer data)
 {
     ob_debug_type(OB_DEBUG_SM, "Die requested");
     ob_exit(0);
 }
 
-static void sm_save_complete(SmcConn conn, SmPointer data)
+static void sm_save_complete(G_GNUC_UNUSED SmcConn conn, G_GNUC_UNUSED SmPointer data)
 {
     ob_debug_type(OB_DEBUG_SM, "Save complete");
 }
 
-static void sm_shutdown_cancelled(SmcConn conn, SmPointer data)
+static void sm_shutdown_cancelled(G_GNUC_UNUSED SmcConn conn, G_GNUC_UNUSED SmPointer data)
 {
     ob_debug_type(OB_DEBUG_SM, "Shutdown cancelled");
 }

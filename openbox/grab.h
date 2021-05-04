@@ -25,7 +25,7 @@
 #include <glib.h>
 #include <X11/Xlib.h>
 
-void grab_startup(gboolean reconfig);
+void grab_startup(void);
 void grab_shutdown(gboolean reconfig);
 
 ObtIC *grab_input_context(void);

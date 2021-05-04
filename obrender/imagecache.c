@@ -109,12 +109,18 @@ guint32 hashword(const guint32 *key, gint length, guint32 initval)
     }
 
     /* handle the last 3 guint32's */
-    switch(length)      /* all the case statements fall through */
-    { 
-    case 3: c+=key[2];
-    case 2: b+=key[1];
-    case 1: a+=key[0];
+    switch(length)
+    {
+    case 3:
+        c+=key[2];
+        G_GNUC_FALLTHROUGH;
+    case 2:
+        b+=key[1];
+        G_GNUC_FALLTHROUGH;
+    case 1:
+        a+=key[0];
         final(a,b,c);
+        G_GNUC_FALLTHROUGH;
     case 0:             /* case 0: nothing left to add */
         break;
     }

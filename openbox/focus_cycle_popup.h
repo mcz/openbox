@@ -30,8 +30,8 @@ typedef enum {
     OB_FOCUS_CYCLE_POPUP_MODE_LIST
 } ObFocusCyclePopupMode;
 
-void focus_cycle_popup_startup(gboolean reconfig);
-void focus_cycle_popup_shutdown(gboolean reconfig);
+void focus_cycle_popup_startup(void);
+void focus_cycle_popup_shutdown(void);
 
 void focus_cycle_popup_show(struct _ObClient *c, ObFocusCyclePopupMode mode,
                             gboolean linear);

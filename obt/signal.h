@@ -23,7 +23,7 @@
 
 G_BEGIN_DECLS
 
-typedef void (*ObtSignalHandler)(gint signal, gpointer data);
+typedef void (*ObtSignalHandler)(gint signal);
 
 /*! Listen for signals and report them through the default GMainContext within
    main program thread (except signals that require immediate exit).
@@ -37,7 +37,7 @@ void obt_signal_stop(void);
   called when the signal @sig is fired.  @sig must not be a signal that
   would cause the core to dump as these are handled internally.
  */
-void obt_signal_add_callback(gint sig, ObtSignalHandler func, gpointer data);
+void obt_signal_add_callback(gint sig, ObtSignalHandler func);
 /*! Removes the most recently added callback with the given function. */
 void obt_signal_remove_callback(gint sig, ObtSignalHandler func);
 

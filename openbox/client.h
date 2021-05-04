@@ -323,12 +323,12 @@ extern GList      *client_list;
 void client_startup(gboolean reconfig);
 void client_shutdown(gboolean reconfig);
 
-typedef void (*ObClientCallback)(ObClient *client, gpointer data);
+typedef void (*ObClientCallback)(ObClient *client);
 
 /* Callback functions */
 
 /*! Get notified when the client is unmanaged */
-void client_add_destroy_notify(ObClientCallback func, gpointer data);
+void client_add_destroy_notify(ObClientCallback func);
 void client_remove_destroy_notify(ObClientCallback func);
 void client_remove_destroy_notify_data(ObClientCallback func, gpointer data);
 

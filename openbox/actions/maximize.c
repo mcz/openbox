@@ -117,21 +117,21 @@ static gboolean run_func_toggle(ObActionsData *data, gpointer options)
 }
 
 /* 3.4-compatibility */
-static gpointer setup_both_func(xmlNodePtr node)
+static gpointer setup_both_func(G_GNUC_UNUSED xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
     o->dir = BOTH;
     return o;
 }
 
-static gpointer setup_horz_func(xmlNodePtr node)
+static gpointer setup_horz_func(G_GNUC_UNUSED xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
     o->dir = HORZ;
     return o;
 }
 
-static gpointer setup_vert_func(xmlNodePtr node)
+static gpointer setup_vert_func(G_GNUC_UNUSED xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
     o->dir = VERT;

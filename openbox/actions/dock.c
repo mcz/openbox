@@ -17,7 +17,7 @@ void action_dock_startup(void)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean raise_func(ObActionsData *data, gpointer options)
+static gboolean raise_func(ObActionsData *data, G_GNUC_UNUSED gpointer options)
 {
     actions_client_move(data, TRUE);
     dock_raise_dock();
@@ -27,7 +27,7 @@ static gboolean raise_func(ObActionsData *data, gpointer options)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean lower_func(ObActionsData *data, gpointer options)
+static gboolean lower_func(ObActionsData *data, G_GNUC_UNUSED gpointer options)
 {
     actions_client_move(data, TRUE);
     dock_lower_dock();

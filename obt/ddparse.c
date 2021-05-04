@@ -235,9 +235,7 @@ static gchar** parse_value_strings(const gchar *in,
     return out;
 }
 
-static guint parse_value_environments(const gchar *in,
-                                      const ObtDDParse *const parse,
-                                      gboolean *error)
+static guint parse_value_environments(const gchar *in)
 {
     const gchar *s;
     guint mask = 0;
@@ -735,7 +733,7 @@ static gboolean parse_desktop_entry_value(gchar *key, const gchar *val,
         }
         break;
     case OBT_DDPARSE_ENVIRONMENTS:
-        v.value.environments = parse_value_environments(val, parse, error);
+        v.value.environments = parse_value_environments(val);
         break;
     default:
         g_assert_not_reached();

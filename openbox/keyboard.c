@@ -63,13 +63,13 @@ static void grab_keys(gboolean grab)
     }
 }
 
-static gboolean chain_timeout(gpointer data)
+static gboolean chain_timeout(G_GNUC_UNUSED gpointer data)
 {
     keyboard_reset_chains(0);
     return FALSE; /* don't repeat */
 }
 
-static void chain_done(gpointer data)
+static void chain_done(G_GNUC_UNUSED gpointer data)
 {
     chain_timer = 0;
 }
@@ -321,14 +321,14 @@ void keyboard_rebind(void)
     grab_keys(TRUE);
 }
 
-void keyboard_startup(gboolean reconfig)
+void keyboard_startup(void)
 {
     grab_keys(TRUE);
     popup = popup_new();
     popup_set_text_align(popup, RR_JUSTIFY_CENTER);
 }
 
-void keyboard_shutdown(gboolean reconfig)
+void keyboard_shutdown(void)
 {
     if (chain_timer) g_source_remove(chain_timer);
 
