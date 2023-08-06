@@ -57,4 +57,6 @@ void moveresize_end(gboolean cancel);
 
 gboolean moveresize_event(XEvent *e);
 
+Rect moveresize_find_tile_area(struct _ObClient *c, ObDirection dir);
+
 #endif

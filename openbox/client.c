@@ -3046,67 +3046,13 @@ void client_try_configure(ObClient *self, gint *x, gint *y, gint *w, gint *h,
 
         g_slice_free(Rect, a);
     } else if (self->tiled) {
-        Rect *a;
-        guint i;
+        Rect a;
 
-        i = screen_find_monitor(&desired);
-        a = screen_area(self->desktop, i, &desired);
-
-        /* when setting widthi/height to 50% of an odd amount of pixels,
-           give the extra one to the top/left client */
-        switch (self->tile_dir) {
-        case OB_DIRECTION_NORTH:
-            *x = a->x;
-            *y = a->y;
-            *w = a->width;
-            *h = (a->height / 2) + ((a->height % 2 ) ? 1 : 0);
-            break;
-        case OB_DIRECTION_NORTHEAST:
-            *x = (a->x + (a->width / 2)) + ((a->width % 2) ? 1 : 0);
-            *y = a->y;
-            *w = (a->width / 2);
-            *h = (a->height / 2) + ((a->height % 2 ) ? 1 : 0);
-            break;
-        case OB_DIRECTION_EAST:
-            *x = (a->x + (a->width / 2)) + ((a->width % 2) ? 1 : 0);
-            *y = a->y;
-            *w = (a->width / 2);
-            *h = a->height;
-            break;
-        case OB_DIRECTION_SOUTHEAST:
-            *x = (a->x + (a->width / 2)) + ((a->width % 2) ? 1 : 0);
-            *y = (a->y + (a->height / 2)) + ((a->height % 2) ? 1 : 0);
-            *w = (a->width / 2);
-            *h = (a->height / 2 );
-            break;
-        case OB_DIRECTION_SOUTH:
-            *x = a->x;
-            *y = (a->y + (a->height / 2)) + ((a->height % 2) ? 1 : 0);
-            *w = a->width;
-            *h = (a->height / 2);
-            break;
-        case OB_DIRECTION_SOUTHWEST:
-            *x = a->x;
-            *y = (a->y + (a->height / 2)) + ((a->height % 2) ? 1 : 0);
-            *w = (a->width / 2) + ((a->width % 2) ? 1 : 0);
-            *h = (a->height / 2);
-            break;
-        case OB_DIRECTION_WEST:
-            *x = a->x;
-            *y = a->y;
-            *w = (a->width / 2) + ((a->width % 2) ? 1 : 0);
-            *h = a->height;
-            break;
-        case OB_DIRECTION_NORTHWEST:
-            *x = a->x;
-            *y = a->y;
-            *w = (a->width / 2) + ((a->width % 2) ? 1 : 0);
-            *h = (a->height / 2) + ((a->height % 2 ) ? 1 : 0);
-            break;
-        }
-
-        *w -= self->frame->size.left + self->frame->size.right;
-        *h -= self->frame->size.top + self->frame->size.bottom;
+        a = moveresize_find_tile_area(self, self->tile_dir);
+        *x = a.x;
+        *y = a.y;
+        *w = a.width - self->frame->size.left + self->frame->size.right;
+        *h = a.height - self->frame->size.top + self->frame->size.bottom;
     }
 
     /* gets the client's position */

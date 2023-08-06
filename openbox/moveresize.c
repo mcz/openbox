@@ -25,6 +25,7 @@
 #include "client.h"
 #include "focus.h"
 #include "frame.h"
+#include "indicator_frame.h"
 #include "openbox.h"
 #include "resist.h"
 #include "popup.h"
@@ -64,6 +65,7 @@ static guint button;
 static guint32 corner;
 static ObDirection edge_action_dir = -1;
 static gboolean edge_action_odd = FALSE;
+static gboolean edge_snap_queued = FALSE;
 static guint edge_action_timer = 0;
 static ObDirection key_resize_edge = -1;
 static guint waiting_for_sync;
@@ -679,44 +681,20 @@ static void do_edge_warp(gint x, gint y)
         if (dir != (ObDirection)-1) {
             edge_action_odd = TRUE; /* switch on the first timeout */
             edge_action_timer = g_timeout_add(config_mouse_screenedgetime,
-                                            edge_warp_delay_func, NULL);
+                                              edge_warp_delay_func, NULL);
         }
         edge_action_dir = dir;
     }
 }
 
-static void edge_snap_cleanup(gpointer data)
-{
-    g_free(data);
-    edge_action_timer = 0;
-}
-
 static gboolean edge_snap_delay_func(gpointer data)
 {
-    int x, y;
+    Rect a;
 
-    client_tile(moveresize_client, TRUE, edge_action_dir);
-
-    /* Trust me */
-    x = (((Point *)data)->x - cur_x) * moveresize_client->area.width /
-         moveresize_client->pre_tile_area.width + moveresize_client->area.x;
-    y = (((Point *)data)->y - cur_y) * moveresize_client->area.height /
-         moveresize_client->pre_tile_area.height + moveresize_client->area.y;
-
-    XWarpPointer(obt_display, None, obt_root(ob_screen), 0, 0, 0, 0, x, y);
-
-    /* steal the motion events this causes */
-    XSync(obt_display, FALSE);
-    {
-        XEvent ce;
-        while (xqueue_remove_local(&ce, xqueue_match_type,
-                                   GINT_TO_POINTER(MotionNotify)));
-    }
-
-    start_cx = moveresize_client->area.x;
-    start_cy = moveresize_client->area.y;
-    start_x = x;
-    start_y = y;
+    a = moveresize_find_tile_area(moveresize_client, data ? *(ObDirection *)data : edge_action_dir);
+    indicator_frame_draw(&a);
+    edge_snap_queued = TRUE;
+    edge_action_timer = 0;
 
     return FALSE; /* don't repeat ! */
 }
@@ -727,7 +705,6 @@ static void do_edge_snap(gint x, gint y)
 
     int i;
     ObDirection dir;
-    gpointer pt = g_malloc(sizeof(Point));
 
     dir = -1;
 
@@ -784,23 +761,30 @@ static void do_edge_snap(gint x, gint y)
         }
     }
 
-    if (dir != edge_action_dir) {
+    if (dir == (ObDirection)-1) {
+        edge_snap_queued = FALSE;
+        indicator_frame_update(NULL);
         cancel_edge_action();
-        if (dir != (ObDirection)-1) {
-            POINT_SET(*(Point *)pt, x, y);
-            edge_action_timer = g_timeout_add_full(G_PRIORITY_DEFAULT,
-                                                   config_mouse_screenedgetime,
-                                                   edge_snap_delay_func, pt,
-                                                   edge_snap_cleanup);
+    } else if (dir != edge_action_dir) {
+        if (edge_action_dir == (ObDirection)-1) {
+            edge_action_timer = g_timeout_add(config_mouse_screenedgetime,
+                                              edge_snap_delay_func, NULL);
+        } else if (!edge_action_timer) {
+            /* if the timer is finished, redraw the frame */
+            edge_snap_delay_func(&dir);
         }
-        edge_action_dir = dir;
     }
+    edge_action_dir = dir;
 }
 
 static void cancel_edge_action(void)
 {
-    if (edge_action_timer) g_source_remove(edge_action_timer);
+    if (edge_action_timer)
+        g_source_remove(edge_action_timer);
     edge_action_timer = 0;
+    indicator_frame_update(NULL);
+    if (edge_snap_queued)
+        client_tile(moveresize_client, TRUE, edge_action_dir);
 }
 
 static void move_with_keys(KeySym sym, guint state)
@@ -1429,4 +1413,66 @@ gboolean moveresize_event(XEvent *e)
         event_update_user_time();
 
     return used;
+}
+
+Rect moveresize_find_tile_area(ObClient *c, ObDirection dir)
+{
+    Rect *a, res;
+
+    /* find the area of the screen containing the client */
+    a = screen_area(c->desktop, SCREEN_AREA_ONE_MONITOR, &(c->frame->area));
+
+    /* when setting widthi/height to 50% of an odd amount of pixels,
+       give the extra one to the top/left client */
+    switch (dir) {
+    case OB_DIRECTION_NORTH:
+        res.x = a->x;
+        res.y = a->y;
+        res.width = a->width;
+        res.height = (a->height / 2) + ((a->height % 2 ) ? 1 : 0);
+        break;
+    case OB_DIRECTION_NORTHEAST:
+        res.x = (a->x + (a->width / 2)) + ((a->width % 2) ? 1 : 0);
+        res.y = a->y;
+        res.width = (a->width / 2);
+        res.height = (a->height / 2) + ((a->height % 2 ) ? 1 : 0);
+        break;
+    case OB_DIRECTION_EAST:
+        res.x = (a->x + (a->width / 2)) + ((a->width % 2) ? 1 : 0);
+        res.y = a->y;
+        res.width = (a->width / 2);
+        res.height = a->height;
+        break;
+    case OB_DIRECTION_SOUTHEAST:
+        res.x = (a->x + (a->width / 2)) + ((a->width % 2) ? 1 : 0);
+        res.y = (a->y + (a->height / 2)) + ((a->height % 2) ? 1 : 0);
+        res.width = (a->width / 2);
+        res.height = (a->height / 2 );
+        break;
+    case OB_DIRECTION_SOUTH:
+        res.x = a->x;
+        res.y = (a->y + (a->height / 2)) + ((a->height % 2) ? 1 : 0);
+        res.width = a->width;
+        res.height = (a->height / 2);
+        break;
+    case OB_DIRECTION_SOUTHWEST:
+        res.x = a->x;
+        res.y = (a->y + (a->height / 2)) + ((a->height % 2) ? 1 : 0);
+        res.width = (a->width / 2) + ((a->width % 2) ? 1 : 0);
+        res.height = (a->height / 2);
+        break;
+    case OB_DIRECTION_WEST:
+        res.x = a->x;
+        res.y = a->y;
+        res.width = (a->width / 2) + ((a->width % 2) ? 1 : 0);
+        res.height = a->height;
+        break;
+    case OB_DIRECTION_NORTHWEST:
+        res.x = a->x;
+        res.y = a->y;
+        res.width = (a->width / 2) + ((a->width % 2) ? 1 : 0);
+        res.height = (a->height / 2) + ((a->height % 2 ) ? 1 : 0);
+        break;
+    }
+    return res;
 }
