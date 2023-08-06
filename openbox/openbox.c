@@ -31,11 +31,11 @@
 #include "startupnotify.h"
 #include "focus.h"
 #include "focus_cycle.h"
-#include "focus_cycle_indicator.h"
 #include "focus_cycle_popup.h"
 #include "moveresize.h"
 #include "frame.h"
 #include "framerender.h"
+#include "indicator_frame.h"
 #include "keyboard.h"
 #include "mouse.h"
 #include "menuframe.h"
@@ -316,7 +316,7 @@ gint main(gint argc, gchar **argv)
             window_startup(reconfigure);
             focus_startup(reconfigure);
             focus_cycle_startup(reconfigure);
-            focus_cycle_indicator_startup(reconfigure);
+            indicator_frame_startup(reconfigure);
             focus_cycle_popup_startup(reconfigure);
             screen_startup(reconfigure);
             grab_startup(reconfigure);
@@ -406,7 +406,7 @@ gint main(gint argc, gchar **argv)
             grab_shutdown(reconfigure);
             screen_shutdown(reconfigure);
             focus_cycle_popup_shutdown(reconfigure);
-            focus_cycle_indicator_shutdown(reconfigure);
+            indicator_frame_shutdown(reconfigure);
             focus_cycle_shutdown(reconfigure);
             focus_shutdown(reconfigure);
             window_shutdown(reconfigure);

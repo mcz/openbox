@@ -1,6 +1,6 @@
 /* -*- indent-tabs-mode: nil; tab-width: 4; c-basic-offset: 4; -*-
 
-   focus_cycle_indicator.h for the Openbox window manager
+   indicator_frame.h for the Openbox window manager
    Copyright (c) 2006        Mikael Magnusson
    Copyright (c) 2003-2007   Dana Jansens
 
@@ -17,15 +17,15 @@
    See the COPYING file for a copy of the GNU General Public License.
 */
 
-#ifndef __focus_cycle_indicator_h
-#define __focus_cycle_indicator_h
+#ifndef __indicator_frame_h
+#define __indicator_frame_h
 
-struct _ObClient;
+struct _Rect;
 
-void focus_cycle_indicator_startup(gboolean reconfig);
-void focus_cycle_indicator_shutdown(gboolean reconfig);
+void indicator_frame_startup(gboolean reconfig);
+void indicator_frame_shutdown(gboolean reconfig);
 
-void focus_cycle_update_indicator(struct _ObClient *c);
-void focus_cycle_draw_indicator(struct _ObClient *c);
+void indicator_frame_update(struct _Rect *area);
+void indicator_frame_draw(struct _Rect *area);
 
 #endif

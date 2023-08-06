@@ -25,7 +25,7 @@
 #include "config.h"
 #include "framerender.h"
 #include "focus_cycle.h"
-#include "focus_cycle_indicator.h"
+#include "indicator_frame.h"
 #include "moveresize.h"
 #include "screen.h"
 #include "obrender/theme.h"
@@ -879,7 +879,7 @@ void frame_adjust_area(ObFrame *self, gboolean moved,
         /* if this occurs while we are focus cycling, the indicator needs to
            match the changes */
         if (focus_cycle_target == self->client)
-            focus_cycle_update_indicator(self->client);
+            indicator_frame_update(&(self->area));
     }
     if (resized && (self->decorations & OB_FRAME_DECOR_TITLEBAR) &&
         self->label_width)

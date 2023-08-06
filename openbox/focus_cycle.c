@@ -18,7 +18,7 @@
 */
 
 #include "focus_cycle.h"
-#include "focus_cycle_indicator.h"
+#include "indicator_frame.h"
 #include "client.h"
 #include "frame.h"
 #include "focus.h"
@@ -90,7 +90,7 @@ void focus_cycle_reorder()
         focus_cycle_target = focus_cycle_popup_refresh(focus_cycle_target,
                                                        TRUE,
                                                        focus_cycle_linear);
-        focus_cycle_update_indicator(focus_cycle_target);
+        indicator_frame_update(&(focus_cycle_target->frame->area));
         if (!focus_cycle_target)
             focus_cycle(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
                         TRUE, OB_FOCUS_CYCLE_POPUP_MODE_NONE,
@@ -150,7 +150,7 @@ ObClient* focus_cycle(gboolean forward, gboolean all_desktops,
             if (ft != focus_cycle_target) { /* prevents flicker */
                 focus_cycle_target = ft;
                 focus_cycle_type = OB_CYCLE_NORMAL;
-                focus_cycle_draw_indicator(showbar ? ft : NULL);
+                indicator_frame_draw(showbar ? &(ft->frame->area) : NULL);
             }
             /* same arguments as focus_target_valid */
             focus_cycle_popup_show(ft, mode, focus_cycle_linear);
@@ -166,7 +166,7 @@ done_cycle:
     g_list_free(order);
     order = NULL;
 
-    focus_cycle_draw_indicator(NULL);
+    indicator_frame_draw(NULL);
     focus_cycle_popup_hide();
 
     return ret;
@@ -317,7 +317,7 @@ ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
         focus_cycle_type = OB_CYCLE_DIRECTIONAL;
         if (!interactive)
             goto done_cycle;
-        focus_cycle_draw_indicator(showbar ? ft : NULL);
+        indicator_frame_draw(showbar ? &(ft->frame->area) : NULL);
     }
     if (focus_cycle_target && dialog)
         /* same arguments as focus_target_valid */
@@ -331,7 +331,7 @@ done_cycle:
     focus_cycle_target = NULL;
     focus_cycle_type = OB_CYCLE_NONE;
 
-    focus_cycle_draw_indicator(NULL);
+    indicator_frame_draw(NULL);
     focus_cycle_popup_single_hide();
 
     return ret;

@@ -258,8 +258,6 @@ openbox_openbox_SOURCES = \
 	openbox/focus.h \
 	openbox/focus_cycle.c \
 	openbox/focus_cycle.h \
-	openbox/focus_cycle_indicator.c \
-	openbox/focus_cycle_indicator.h \
 	openbox/focus_cycle_popup.c \
 	openbox/focus_cycle_popup.h \
 	openbox/frame.c \
@@ -271,6 +269,8 @@ openbox_openbox_SOURCES = \
 	openbox/grab.h \
 	openbox/group.c \
 	openbox/group.h \
+	openbox/indicator_frame.c \
+	openbox/indicator_frame.h \
 	openbox/keyboard.c \
 	openbox/keyboard.h \
 	openbox/keytree.c \
