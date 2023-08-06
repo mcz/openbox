@@ -12,7 +12,7 @@ void action_dockautohide_startup(void)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionsData *data, gpointer options)
+static gboolean run_func(G_GNUC_UNUSED ObActionsData *data, G_GNUC_UNUSED gpointer options)
 {
     config_dock_hide = !config_dock_hide;
     dock_configure();

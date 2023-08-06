@@ -456,7 +456,7 @@ static gboolean run_func_foreach(ObActionsData *data, gpointer options)
     return FALSE;
 }
 
-static gboolean run_func_stop(ObActionsData *data, gpointer options)
+static gboolean run_func_stop(G_GNUC_UNUSED ObActionsData *data, G_GNUC_UNUSED gpointer options)
 {
     /* This stops the loop above so we don't invoke actions on any more
        clients */

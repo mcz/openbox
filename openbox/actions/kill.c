@@ -11,7 +11,7 @@ void action_kill_startup(void)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionsData *data, gpointer options)
+static gboolean run_func(ObActionsData *data, G_GNUC_UNUSED gpointer options)
 {
     if (data->client)
         client_kill(data->client);

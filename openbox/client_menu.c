@@ -64,7 +64,7 @@ static void set_icon_color(ObMenuEntry *e)
         ob_rr_theme->menu_disabled_selected_color;
 }
 
-static gboolean client_menu_update(ObMenuFrame *frame, gpointer data)
+static gboolean client_menu_update(ObMenuFrame *frame, G_GNUC_UNUSED gpointer data)
 {
     ObMenu *menu = frame->menu;
     GList *it;
@@ -112,8 +112,8 @@ static gboolean client_menu_update(ObMenuFrame *frame, gpointer data)
     return TRUE; /* show the menu */
 }
 
-static void client_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
-                                ObClient *c, guint state, gpointer data)
+static void client_menu_execute(ObMenuEntry *e, ObMenuFrame *f, ObClient *c,
+                                G_GNUC_UNUSED guint state, G_GNUC_UNUSED gpointer data)
 {
     gint x, y;
     gulong ignore_start;
@@ -179,7 +179,7 @@ static void client_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
     }
 }
 
-static gboolean layer_menu_update(ObMenuFrame *frame, gpointer data)
+static gboolean layer_menu_update(ObMenuFrame *frame, G_GNUC_UNUSED gpointer data)
 {
     ObMenu *menu = frame->menu;
     GList *it;
@@ -211,8 +211,8 @@ static gboolean layer_menu_update(ObMenuFrame *frame, gpointer data)
     return TRUE; /* show the menu */
 }
 
-static void layer_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
-                               ObClient *c, guint state, gpointer data)
+static void layer_menu_execute(ObMenuEntry *e, ObMenuFrame *f, ObClient *c,
+                               G_GNUC_UNUSED guint state, G_GNUC_UNUSED gpointer data)
 {
     gulong ignore_start;
 
@@ -285,8 +285,8 @@ static gboolean send_to_menu_update(ObMenuFrame *frame, gpointer data)
     return TRUE; /* show the menu */
 }
 
-static void send_to_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
-                                 ObClient *c, guint state, gpointer data)
+static void send_to_menu_execute(ObMenuEntry *e, ObMenuFrame *f, ObClient *c,
+                                 G_GNUC_UNUSED guint state, G_GNUC_UNUSED gpointer data)
 {
     g_assert(c);
 
@@ -301,7 +301,7 @@ static void send_to_menu_execute(ObMenuEntry *e, ObMenuFrame *f,
 }
 
 static void client_menu_place(ObMenuFrame *frame, gint *x, gint *y,
-                              gboolean mouse, gpointer data)
+                              gboolean mouse, G_GNUC_UNUSED gpointer data)
 {
     gint dx, dy;
 

@@ -68,7 +68,6 @@
 typedef struct
 {
     ObClientCallback func;
-    gpointer data;
 } ClientCallback;
 
 GList          *client_list             = NULL;
@@ -142,15 +141,14 @@ static void client_call_notifies(ObClient *self, GSList *list)
 
     for (it = list; it; it = g_slist_next(it)) {
         ClientCallback *d = it->data;
-        d->func(self, d->data);
+        d->func(self);
     }
 }
 
-void client_add_destroy_notify(ObClientCallback func, gpointer data)
+void client_add_destroy_notify(ObClientCallback func)
 {
     ClientCallback *d = g_slice_new(ClientCallback);
     d->func = func;
-    d->data = data;
     client_destroy_notifies = g_slist_prepend(client_destroy_notifies, d);
 }
 
@@ -161,21 +159,6 @@ void client_remove_destroy_notify(ObClientCallback func)
     for (it = client_destroy_notifies; it; it = g_slist_next(it)) {
         ClientCallback *d = it->data;
         if (d->func == func) {
-            g_slice_free(ClientCallback, d);
-            client_destroy_notifies =
-                g_slist_delete_link(client_destroy_notifies, it);
-            break;
-        }
-    }
-}
-
-void client_remove_destroy_notify_data(ObClientCallback func, gpointer data)
-{
-    GSList *it;
-
-    for (it = client_destroy_notifies; it; it = g_slist_next(it)) {
-        ClientCallback *d = it->data;
-        if (d->func == func && d->data == data) {
             g_slice_free(ClientCallback, d);
             client_destroy_notifies =
                 g_slist_delete_link(client_destroy_notifies, it);
@@ -2722,7 +2705,7 @@ void client_calc_layer(ObClient *self)
     client_calc_layer_internal(self);
 
     /* skip over stuff above fullscreen layer */
-    for (it = stacking_list; it; it = g_list_next(it))
+    for (it = g_list_copy(stacking_list); it; it = g_list_next(it))
         if (window_layer(it->data) <= OB_STACKING_LAYER_FULLSCREEN) break;
 
     /* now recalc any windows in the fullscreen layer which have not
@@ -2733,6 +2716,7 @@ void client_calc_layer(ObClient *self)
                  !WINDOW_AS_CLIENT(it->data)->visited)
             client_calc_layer_internal(it->data);
     }
+    g_list_free(it);
 }
 
 gboolean client_should_show(ObClient *self)
@@ -3662,7 +3646,7 @@ void client_close(ObClient *self)
 #define OB_KILL_RESULT_NO 0
 #define OB_KILL_RESULT_YES 1
 
-static gboolean client_kill_requested(ObPrompt *p, gint result, gpointer data)
+static gboolean client_kill_requested(gint result, gpointer data)
 {
     ObClient *self = data;
 

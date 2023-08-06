@@ -266,7 +266,7 @@ gboolean mouse_event(ObClient *client, XEvent *e)
            way it is grabbed, so just fake one */
         if (!CLIENT_CONTEXT(context, client))
             break;
-
+        G_GNUC_FALLTHROUGH;
     case ButtonRelease:
         /* use where the press occured in the window */
         context = frame_context(client, e->xbutton.window, pwx, pwy);
@@ -401,12 +401,12 @@ gboolean mouse_bind(const gchar *buttonstr, ObFrameContext context,
     return TRUE;
 }
 
-void mouse_startup(gboolean reconfig)
+void mouse_startup(void)
 {
     grab_all_clients(TRUE);
 }
 
-void mouse_shutdown(gboolean reconfig)
+void mouse_shutdown(void)
 {
     grab_all_clients(FALSE);
     mouse_unbind_all();

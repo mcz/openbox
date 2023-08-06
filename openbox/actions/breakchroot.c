@@ -11,7 +11,7 @@ void action_breakchroot_startup(void)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionsData *data, gpointer options)
+static gboolean run_func(G_GNUC_UNUSED ObActionsData *data, G_GNUC_UNUSED gpointer options)
 {
     /* break out of one chroot */
     keyboard_reset_chains(1);

@@ -28,7 +28,6 @@
 #include "client.h"
 #include "screen.h"
 #include "actions.h"
-#include "startupnotify.h"
 #include "focus.h"
 #include "focus_cycle.h"
 #include "focus_cycle_popup.h"
@@ -109,7 +108,7 @@ static gboolean  being_replaced = FALSE;
 static gchar    *config_file = NULL;
 static gchar    *startup_cmd = NULL;
 
-static void signal_handler(gint signal, gpointer data);
+static void signal_handler(gint signal);
 static void remove_args(gint *argc, gchar **argv, gint index, gint num);
 static void parse_env();
 static void parse_args(gint *argc, gchar **argv);
@@ -167,15 +166,15 @@ gint main(gint argc, gchar **argv)
 
     /* set up signal handlers, they are called from the mainloop
        in the main program's thread */
-    obt_signal_add_callback(SIGUSR1, signal_handler, NULL);
-    obt_signal_add_callback(SIGUSR2, signal_handler, NULL);
-    obt_signal_add_callback(SIGTERM, signal_handler, NULL);
-    obt_signal_add_callback(SIGINT,  signal_handler, NULL);
-    obt_signal_add_callback(SIGHUP,  signal_handler, NULL);
-    obt_signal_add_callback(SIGPIPE, signal_handler, NULL);
-    obt_signal_add_callback(SIGCHLD, signal_handler, NULL);
-    obt_signal_add_callback(SIGTTIN, signal_handler, NULL);
-    obt_signal_add_callback(SIGTTOU, signal_handler, NULL);
+    obt_signal_add_callback(SIGUSR1, signal_handler);
+    obt_signal_add_callback(SIGUSR2, signal_handler);
+    obt_signal_add_callback(SIGTERM, signal_handler);
+    obt_signal_add_callback(SIGINT,  signal_handler);
+    obt_signal_add_callback(SIGHUP,  signal_handler);
+    obt_signal_add_callback(SIGPIPE, signal_handler);
+    obt_signal_add_callback(SIGCHLD, signal_handler);
+    obt_signal_add_callback(SIGTTIN, signal_handler);
+    obt_signal_add_callback(SIGTTOU, signal_handler);
 
     ob_screen = DefaultScreen(obt_display);
 
@@ -312,21 +311,20 @@ gint main(gint argc, gchar **argv)
             event_startup(reconfigure);
             /* focus_backup is used for stacking, so this needs to come before
                anything that calls stacking_add */
-            sn_startup(reconfigure);
             window_startup(reconfigure);
             focus_startup(reconfigure);
             focus_cycle_startup(reconfigure);
             indicator_frame_startup(reconfigure);
             focus_cycle_popup_startup(reconfigure);
             screen_startup(reconfigure);
-            grab_startup(reconfigure);
+            grab_startup();
             group_startup(reconfigure);
             ping_startup(reconfigure);
             client_startup(reconfigure);
             dock_startup(reconfigure);
             moveresize_startup(reconfigure);
-            keyboard_startup(reconfigure);
-            mouse_startup(reconfigure);
+            keyboard_startup();
+            mouse_startup();
             menu_frame_startup(reconfigure);
             menu_startup(reconfigure);
             prompt_startup(reconfigure);
@@ -396,8 +394,8 @@ gint main(gint argc, gchar **argv)
             prompt_shutdown(reconfigure);
             menu_shutdown(reconfigure);
             menu_frame_shutdown(reconfigure);
-            mouse_shutdown(reconfigure);
-            keyboard_shutdown(reconfigure);
+            mouse_shutdown();
+            keyboard_shutdown();
             moveresize_shutdown(reconfigure);
             dock_shutdown(reconfigure);
             client_shutdown(reconfigure);
@@ -410,7 +408,6 @@ gint main(gint argc, gchar **argv)
             focus_cycle_shutdown(reconfigure);
             focus_shutdown(reconfigure);
             window_shutdown(reconfigure);
-            sn_shutdown(reconfigure);
             event_shutdown(reconfigure);
             config_shutdown();
             actions_shutdown(reconfigure);
@@ -491,7 +488,7 @@ gint main(gint argc, gchar **argv)
     return exitcode;
 }
 
-static void signal_handler(gint signal, gpointer data)
+static void signal_handler(gint signal)
 {
     switch (signal) {
     case SIGUSR1:

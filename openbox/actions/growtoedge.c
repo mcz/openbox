@@ -273,7 +273,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 }
 
 /* 3.4-compatibility */
-static gpointer setup_north_func(xmlNodePtr node)
+static gpointer setup_north_func(G_GNUC_UNUSED xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
     o->shrink = FALSE;
@@ -281,7 +281,7 @@ static gpointer setup_north_func(xmlNodePtr node)
     return o;
 }
 
-static gpointer setup_south_func(xmlNodePtr node)
+static gpointer setup_south_func(G_GNUC_UNUSED xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
     o->shrink = FALSE;
@@ -289,7 +289,7 @@ static gpointer setup_south_func(xmlNodePtr node)
     return o;
 }
 
-static gpointer setup_east_func(xmlNodePtr node)
+static gpointer setup_east_func(G_GNUC_UNUSED xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
     o->shrink = FALSE;
@@ -297,7 +297,7 @@ static gpointer setup_east_func(xmlNodePtr node)
     return o;
 }
 
-static gpointer setup_west_func(xmlNodePtr node)
+static gpointer setup_west_func(G_GNUC_UNUSED xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
     o->shrink = FALSE;

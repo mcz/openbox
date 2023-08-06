@@ -34,7 +34,7 @@ static void free_func(gpointer o)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionsData *data, gpointer options)
+static gboolean run_func(G_GNUC_UNUSED ObActionsData *data, gpointer options)
 {
     Options *o = options;
 

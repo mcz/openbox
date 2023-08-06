@@ -44,20 +44,7 @@ static gboolean focus_cycle_nonhilite_windows;
 static gboolean focus_cycle_dock_windows;
 static gboolean focus_cycle_desktop_windows;
 
-static ObClient *focus_find_directional(ObClient *c,
-                                        ObDirection dir,
-                                        gboolean dock_windows,
-                                        gboolean desktop_windows);
-
-void focus_cycle_startup(gboolean reconfig)
-{
-    if (reconfig) return;
-}
-
-void focus_cycle_shutdown(gboolean reconfig)
-{
-    if (reconfig) return;
-}
+static ObClient *focus_find_directional(ObClient *c, ObDirection dir);
 
 void focus_cycle_addremove(ObClient *c, gboolean redraw)
 {
@@ -173,9 +160,7 @@ done_cycle:
 }
 
 /* this be mostly ripped from fvwm */
-static ObClient *focus_find_directional(ObClient *c, ObDirection dir,
-                                        gboolean dock_windows,
-                                        gboolean desktop_windows)
+static ObClient *focus_find_directional(ObClient *c, ObDirection dir)
 {
     gint my_cx, my_cy, his_cx, his_cy;
     gint offset = 0;
@@ -298,10 +283,9 @@ ObClient* focus_directional_cycle(ObDirection dir, gboolean dock_windows,
     if (!first) first = focus_client;
 
     if (focus_cycle_target)
-        ft = focus_find_directional(focus_cycle_target, dir, dock_windows,
-                                    desktop_windows);
+        ft = focus_find_directional(focus_cycle_target, dir);
     else if (first)
-        ft = focus_find_directional(first, dir, dock_windows, desktop_windows);
+        ft = focus_find_directional(first, dir);
     else {
         GList *it;
 

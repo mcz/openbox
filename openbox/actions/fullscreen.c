@@ -9,7 +9,7 @@ void action_fullscreen_startup(void)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func_toggle(ObActionsData *data, gpointer options)
+static gboolean run_func_toggle(ObActionsData *data, G_GNUC_UNUSED gpointer options)
 {
     if (data->client) {
         actions_client_move(data, TRUE);

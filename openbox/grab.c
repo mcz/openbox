@@ -150,7 +150,7 @@ gint grab_server(gboolean grab)
     return sgrabs;
 }
 
-void grab_startup(gboolean reconfig)
+void grab_startup(void)
 {
     guint i = 0;
     guint num, caps, scroll;

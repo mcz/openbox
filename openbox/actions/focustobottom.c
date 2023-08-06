@@ -9,7 +9,7 @@ void action_focustobottom_startup(void)
 }
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionsData *data, gpointer options)
+static gboolean run_func(ObActionsData *data, G_GNUC_UNUSED gpointer options)
 {
     if (data->client)
         focus_order_to_bottom(data->client);

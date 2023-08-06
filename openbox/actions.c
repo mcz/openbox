@@ -59,7 +59,6 @@ struct _ObActionsAct {
     guint ref;
 
     ObActionsDefinition *def;
-    ObActionsIPreFunc i_pre;
     ObActionsIInputFunc i_input;
     ObActionsICancelFunc i_cancel;
     ObActionsIPostFunc i_post;
@@ -225,7 +224,6 @@ static ObActionsAct* actions_build_act_from_string(const gchar *name)
         act->ref = 1;
         act->def = def;
         actions_definition_ref(act->def);
-        act->i_pre = NULL;
         act->i_input = NULL;
         act->i_cancel = NULL;
         act->i_post = NULL;
@@ -245,7 +243,6 @@ ObActionsAct* actions_parse_string(const gchar *name)
         if (act->def->canbeinteractive) {
             if (act->def->setup.i)
                 act->options = act->def->setup.i(NULL,
-                                                 &act->i_pre,
                                                  &act->i_input,
                                                  &act->i_cancel,
                                                  &act->i_post);
@@ -255,7 +252,6 @@ ObActionsAct* actions_parse_string(const gchar *name)
                 act->options = act->def->setup.n(NULL);
         }
     }
-                
 
     return act;
 }
@@ -271,7 +267,6 @@ ObActionsAct* actions_parse(xmlNodePtr node)
             if (act->def->canbeinteractive) {
                 if (act->def->setup.i)
                     act->options = act->def->setup.i(node->children,
-                                                     &act->i_pre,
                                                      &act->i_input,
                                                      &act->i_cancel,
                                                      &act->i_post);
@@ -358,14 +353,9 @@ void actions_run_acts(GSList *acts,
         /* if they have the same run function, then we'll assume they are
            cooperating and not cancel eachother out */
         if (!interactive_act || interactive_act->def->run != act->def->run) {
-            if (actions_act_is_interactive(act)) {
-                /* cancel the old one */
-                if (interactive_act)
-                    actions_interactive_cancel_act();
-                if (act->i_pre)
-                    if (!act->i_pre(state, act->options))
-                        act->i_input = NULL; /* remove the interactivity */
-            }
+            /* cancel the old one */
+            if (actions_act_is_interactive(act) && interactive_act)
+                actions_interactive_cancel_act();
             /* check again cuz it might have been cancelled */
             if (actions_act_is_interactive(act))
                 ok = actions_interactive_begin_act(act, state);
@@ -452,8 +442,7 @@ gboolean actions_interactive_input_event(XEvent *e)
     gboolean used = FALSE;
     if (interactive_act) {
         if (!interactive_act->i_input(interactive_initial_state, e,
-                                      grab_input_context(),
-                                      interactive_act->options, &used))
+                                      interactive_act->options))
         {
             used = TRUE; /* if it cancelled the action then it has to of
                             been used */

@@ -83,7 +83,7 @@ static void free_func(gpointer options)
 static gboolean run_func(ObActionsData *data, gpointer options)
 {
     Options *o = options;
-    GravityPoint position = { { 0, }, };
+    GravityPoint position = { 0 };
     gint monitor = -1;
 
     if (o->use_position) {

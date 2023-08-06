@@ -26,8 +26,8 @@
 
 struct _ObActionsAct;
 
-void mouse_startup(gboolean reconfig);
-void mouse_shutdown(gboolean reconfig);
+void mouse_startup();
+void mouse_shutdown();
 
 gboolean mouse_bind(const gchar *buttonstr, ObFrameContext context,
                     ObMouseAction mact, struct _ObActionsAct *action);

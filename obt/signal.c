@@ -36,7 +36,6 @@ typedef struct _ObtSignalCallback ObtSignalCallback;
 struct _ObtSignalCallback
 {
     ObtSignalHandler func;
-    gpointer data;
 };
 
 static gboolean signal_prepare(GSource *source, gint *timeout);
@@ -159,7 +158,7 @@ void obt_signal_stop(void)
     }
 }
 
-void obt_signal_add_callback(gint sig, ObtSignalHandler func, gpointer data)
+void obt_signal_add_callback(gint sig, ObtSignalHandler func)
 {
     ObtSignalCallback *cb;
     gint i;
@@ -171,7 +170,6 @@ void obt_signal_add_callback(gint sig, ObtSignalHandler func, gpointer data)
 
     cb = g_slice_new(ObtSignalCallback);
     cb->func = func;
-    cb->data = data;
     callbacks[sig] = g_slist_prepend(callbacks[sig], cb);
 
     /* install the signal handler */
@@ -217,19 +215,20 @@ void obt_signal_remove_callback(gint sig, ObtSignalHandler func)
     }
 }
 
-static gboolean signal_prepare(GSource *source, gint *timeout)
+static gboolean signal_prepare(G_GNUC_UNUSED GSource *source, gint *timeout)
 {
     *timeout = -1;
     return signal_fired;
 }
 
-static gboolean signal_check(GSource *source)
+static gboolean signal_check(G_GNUC_UNUSED GSource *source)
 {
     return signal_fired;
 }
 
-static gboolean signal_occurred(GSource *source, GSourceFunc callback,
-                                gpointer data)
+static gboolean signal_occurred(G_GNUC_UNUSED GSource *source,
+                                G_GNUC_UNUSED GSourceFunc callback,
+                                G_GNUC_UNUSED gpointer data)
 {
     guint i;
     sigset_t oldset;
@@ -254,7 +253,7 @@ static gboolean signal_occurred(GSource *source, GSourceFunc callback,
             GSList *it;
             for (it = callbacks[i]; it; it = g_slist_next(it)) {
                 const ObtSignalCallback *cb = it->data;
-                cb->func(i, cb->data);
+                cb->func(i);
             }
             --fired[i];
         }

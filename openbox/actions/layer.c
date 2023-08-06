@@ -33,7 +33,7 @@ void action_layer_startup(void)
                      run_func);
 }
 
-static gpointer setup_func_top(xmlNodePtr node)
+static gpointer setup_func_top(G_GNUC_UNUSED xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
     o->layer = 1;
@@ -41,7 +41,7 @@ static gpointer setup_func_top(xmlNodePtr node)
     return o;
 }
 
-static gpointer setup_func_bottom(xmlNodePtr node)
+static gpointer setup_func_bottom(G_GNUC_UNUSED xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
     o->layer = -1;
@@ -106,7 +106,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 }
 
 /* 3.4-compatibility */
-static gpointer setup_sendtop_func(xmlNodePtr node)
+static gpointer setup_sendtop_func(G_GNUC_UNUSED xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
     o->layer = 1;
@@ -114,7 +114,7 @@ static gpointer setup_sendtop_func(xmlNodePtr node)
     return o;
 }
 
-static gpointer setup_sendbottom_func(xmlNodePtr node)
+static gpointer setup_sendbottom_func(G_GNUC_UNUSED xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
     o->layer = -1;
@@ -122,7 +122,7 @@ static gpointer setup_sendbottom_func(xmlNodePtr node)
     return o;
 }
 
-static gpointer setup_sendnormal_func(xmlNodePtr node)
+static gpointer setup_sendnormal_func(G_GNUC_UNUSED xmlNodePtr node)
 {
     Options *o = g_slice_new0(Options);
     o->layer = 0;

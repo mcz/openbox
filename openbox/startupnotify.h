@@ -22,9 +22,6 @@
 #include <glib.h>
 #include <X11/Xlib.h>
 
-void sn_startup(gboolean reconfig);
-void sn_shutdown(gboolean reconfig);
-
 gboolean sn_app_starting(void);
 
 /*! Notify that an app has started

@@ -133,13 +133,13 @@ void menu_shutdown(gboolean reconfig)
     menu_hash = NULL;
 }
 
-static gboolean menu_pipe_submenu(gpointer key, gpointer val, gpointer data)
+static gboolean menu_pipe_submenu(G_GNUC_UNUSED gpointer key, gpointer val, G_GNUC_UNUSED gpointer data)
 {
     ObMenu *menu = val;
     return menu->pipe_creator != NULL;
 }
 
-static void clear_cache(gpointer key, gpointer val, gpointer data)
+static void clear_cache(G_GNUC_UNUSED gpointer key, gpointer val, G_GNUC_UNUSED gpointer data)
 {
     ObMenu *menu = val;
     if (menu->execute)
@@ -450,7 +450,7 @@ void menu_free(ObMenu *menu)
         g_hash_table_remove(menu_hash, menu->name);
 }
 
-static gboolean menu_hide_delay_func(gpointer data)
+static gboolean menu_hide_delay_func(G_GNUC_UNUSED gpointer data)
 {
     menu_can_hide = TRUE;
     menu_timeout_id = 0;
@@ -776,7 +776,7 @@ static int sort_func(const void *a, const void *b) {
   @param start The first entry in the range to sort.
   @param end The last entry in the range to sort.
 */
-static void sort_range(ObMenu *self, GList *start, GList *end, guint len)
+static void sort_range(GList *start, GList *end, guint len)
 {
     ObMenuEntry **ar;
     GList *it;
@@ -806,7 +806,7 @@ void menu_sort_entries(ObMenu *self)
         ObMenuEntry *e = it->data;
         if (e->type == OB_MENU_ENTRY_TYPE_SEPARATOR) {
             end = g_list_previous(it);
-            sort_range(self, start, end, len);
+            sort_range(start, end, len);
 
             it = g_list_next(it); /* skip over the separator */
             start = it;
@@ -816,5 +816,5 @@ void menu_sort_entries(ObMenu *self)
             len += 1;
         last = it;
     }
-    sort_range(self, start, last, len);
+    sort_range(start, last, len);
 }

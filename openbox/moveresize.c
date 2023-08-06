@@ -84,7 +84,7 @@ static void cancel_edge_action();
 static gboolean sync_timeout_func(gpointer data);
 #endif
 
-static void client_dest(ObClient *client, gpointer data)
+static void client_dest(ObClient *client)
 {
     if (moveresize_client == client)
         moveresize_end(TRUE);
@@ -98,7 +98,7 @@ void moveresize_startup(gboolean reconfig)
     popup_set_text_align(popup, RR_JUSTIFY_CENTER);
 
     if (!reconfig)
-        client_add_destroy_notify(client_dest, NULL);
+        client_add_destroy_notify(client_dest);
 }
 
 void moveresize_shutdown(gboolean reconfig)
@@ -481,7 +481,7 @@ static void do_resize(void)
 }
 
 #ifdef SYNC
-static gboolean sync_timeout_func(gpointer data)
+static gboolean sync_timeout_func(G_GNUC_UNUSED gpointer data)
 {
     ++waiting_for_sync; /* we timed out waiting for our sync... */
     do_resize(); /* ...so let any pending resizes through */
@@ -625,7 +625,7 @@ static void edge_warp_move_ptr(void)
     XWarpPointer(obt_display, 0, obt_root(ob_screen), 0, 0, 0, 0, x, y);
 }
 
-static gboolean edge_warp_delay_func(gpointer data)
+static gboolean edge_warp_delay_func(G_GNUC_UNUSED gpointer data)
 {
     guint d;
 

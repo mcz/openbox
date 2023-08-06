@@ -27,17 +27,14 @@ typedef struct {
 } Options;
 
 static gpointer setup_func(xmlNodePtr node,
-                           ObActionsIPreFunc *pre,
                            ObActionsIInputFunc *in,
                            ObActionsICancelFunc *c,
                            ObActionsIPostFunc *post);
 static gpointer setup_forward_func(xmlNodePtr node,
-                                   ObActionsIPreFunc *pre,
                                    ObActionsIInputFunc *in,
                                    ObActionsICancelFunc *c,
                                    ObActionsIPostFunc *post);
 static gpointer setup_backward_func(xmlNodePtr node,
-                                    ObActionsIPreFunc *pre,
                                     ObActionsIInputFunc *in,
                                     ObActionsICancelFunc *c,
                                     ObActionsIPostFunc *post);
@@ -45,9 +42,7 @@ static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 static gboolean i_input_func(guint initial_state,
                              XEvent *e,
-                             ObtIC *ic,
-                             gpointer options,
-                             gboolean *used);
+                             gpointer options);
 static void     i_cancel_func(gpointer options);
 static void     i_post_func(gpointer options);
 
@@ -59,7 +54,6 @@ void action_cyclewindows_startup(void)
 }
 
 static gpointer setup_func(xmlNodePtr node,
-                           ObActionsIPreFunc *pre,
                            ObActionsIInputFunc *input,
                            ObActionsICancelFunc *cancel,
                            ObActionsIPostFunc *post)
@@ -123,23 +117,21 @@ static gpointer setup_func(xmlNodePtr node,
 }
 
 static gpointer setup_forward_func(xmlNodePtr node,
-                                   ObActionsIPreFunc *pre,
                                    ObActionsIInputFunc *input,
                                    ObActionsICancelFunc *cancel,
                                    ObActionsIPostFunc *post)
 {
-    Options *o = setup_func(node, pre, input, cancel, post);
+    Options *o = setup_func(node, input, cancel, post);
     o->forward = TRUE;
     return o;
 }
 
 static gpointer setup_backward_func(xmlNodePtr node,
-                                    ObActionsIPreFunc *pre,
                                     ObActionsIInputFunc *input,
                                     ObActionsICancelFunc *cancel,
                                     ObActionsIPostFunc *post)
 {
-    Options *o = setup_func(node, pre, input, cancel, post);
+    Options *o = setup_func(node, input, cancel, post);
     o->forward = FALSE;
     return o;
 }
@@ -156,7 +148,7 @@ static void free_func(gpointer options)
     g_slice_free(Options, o);
 }
 
-static gboolean run_func(ObActionsData *data, gpointer options)
+static gboolean run_func(G_GNUC_UNUSED ObActionsData *data, gpointer options)
 {
     Options *o = options;
     struct _ObClient *ft;
@@ -183,9 +175,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
 static gboolean i_input_func(guint initial_state,
                              XEvent *e,
-                             ObtIC *ic,
-                             gpointer options,
-                             gboolean *used)
+                             gpointer options)
 {
     Options *o = options;
     guint mods, initial_mods;

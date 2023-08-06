@@ -28,8 +28,6 @@
 
 #ifndef USE_LIBSN
 
-void sn_startup(gboolean reconfig) {}
-void sn_shutdown(gboolean reconfig) {}
 gboolean sn_app_starting() { return FALSE; }
 Time sn_app_started(const gchar *id, const gchar *wmclass, const gchar *name)
 {
@@ -56,7 +54,7 @@ static GSList *sn_waits; /* list of SnStartupSequences we're waiting on */
 
 static SnStartupSequence* sequence_find(const gchar *id);
 
-static void sn_handler(const XEvent *e, gpointer data);
+static void sn_handler(const XEvent *e);
 static void sn_event_func(SnMonitorEvent *event, gpointer data);
 
 void sn_startup(gboolean reconfig)
@@ -68,7 +66,7 @@ void sn_startup(gboolean reconfig)
                                         sn_event_func, NULL, NULL);
     sn_launcher = sn_launcher_context_new(sn_display, ob_screen);
 
-    xqueue_add_callback(sn_handler, NULL);
+    xqueue_add_callback(sn_handler);
 }
 
 void sn_shutdown(gboolean reconfig)
@@ -77,7 +75,7 @@ void sn_shutdown(gboolean reconfig)
 
     if (reconfig) return;
 
-    xqueue_remove_callback(sn_handler, NULL);
+    xqueue_remove_callback(sn_handler);
 
     for (it = sn_waits; it; it = g_slist_next(it))
         sn_startup_sequence_unref((SnStartupSequence*)it->data);
@@ -119,14 +117,14 @@ static gboolean sn_wait_timeout(gpointer data)
     return FALSE; /* don't repeat */
 }
 
-static void sn_handler(const XEvent *e, gpointer data)
+static void sn_handler(const XEvent *e)
 {
     XEvent ec;
     ec = *e;
     sn_display_process_event(sn_display, &ec);
 }
 
-static void sn_event_func(SnMonitorEvent *ev, gpointer data)
+static void sn_event_func(SnMonitorEvent *ev, G_GNUC_UNUSED gpointer data)
 {
     SnStartupSequence *seq;
     gboolean change = FALSE;

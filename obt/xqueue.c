@@ -314,40 +314,40 @@ gboolean xqueue_remove_local(XEvent *event_return,
 gboolean xqueue_pending_local(void)
 {
     g_return_val_if_fail(q != NULL, FALSE);
-    
+
     if (!qnum) read_events(FALSE);
     return qnum != 0;
 }
 
 typedef struct _ObtXQueueCB {
     ObtXQueueFunc func;
-    gpointer data;
 } ObtXQueueCB;
 
 static ObtXQueueCB *callbacks = NULL;
 static guint n_callbacks = 0;
 
-static gboolean event_read(GSource *source, GSourceFunc callback,
-                           gpointer data)
+static gboolean event_read(G_GNUC_UNUSED GSource *source,
+                           G_GNUC_UNUSED GSourceFunc callback,
+                           G_GNUC_UNUSED gpointer data)
 {
     XEvent ev;
 
     while (xqueue_next_local(&ev)) {
         guint i;
         for (i = 0; i < n_callbacks; ++i)
-            callbacks[i].func(&ev, callbacks[i].data);
+            callbacks[i].func(&ev);
     }
 
     return TRUE; /* repeat */
 }
 
-static gboolean x_source_prepare(GSource *source, gint *timeout)
+static gboolean x_source_prepare(G_GNUC_UNUSED GSource *source, gint *timeout)
 {
     *timeout = -1;
     return XPending(obt_display);
 }
 
-static gboolean x_source_check(GSource *source)
+static gboolean x_source_check(G_GNUC_UNUSED GSource *source)
 {
     return XPending(obt_display);
 }
@@ -376,30 +376,29 @@ void xqueue_listen(void)
     g_source_attach(source, NULL);
 }
 
-void xqueue_add_callback(ObtXQueueFunc f, gpointer data)
+void xqueue_add_callback(ObtXQueueFunc f)
 {
     guint i;
 
     g_return_if_fail(f != NULL);
 
     for (i = 0; i < n_callbacks; ++i)
-        if (callbacks[i].func == f && callbacks[i].data == data)
+        if (callbacks[i].func == f)
             return;
 
     callbacks = g_renew(ObtXQueueCB, callbacks, n_callbacks + 1);
     callbacks[n_callbacks].func = f;
-    callbacks[n_callbacks].data = data;
     ++n_callbacks;
 }
 
-void xqueue_remove_callback(ObtXQueueFunc f, gpointer data)
+void xqueue_remove_callback(ObtXQueueFunc f)
 {
     guint i;
 
     g_return_if_fail(f != NULL);
 
     for (i = 0; i < n_callbacks; ++i) {
-        if (callbacks[i].func == f && callbacks[i].data == data) {
+        if (callbacks[i].func == f) {
             /* remove it */
             for (; i < n_callbacks - 1; ++i)
                 callbacks[i] = callbacks[i+1];

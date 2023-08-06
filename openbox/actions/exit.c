@@ -45,21 +45,21 @@ static void do_exit(void)
         ob_exit(0);
 }
 
-static gboolean prompt_cb(ObPrompt *p, gint result, gpointer data)
+static gboolean prompt_cb(gint result, G_GNUC_UNUSED gpointer data)
 {
     if (result)
         do_exit();
     return TRUE; /* call the cleanup func */
 }
 
-static void prompt_cleanup(ObPrompt *p, gpointer data)
+static void prompt_cleanup(ObPrompt *p, G_GNUC_UNUSED gpointer data)
 {
     prompt_unref(p);
 }
 
 
 /* Always return FALSE because its not interactive */
-static gboolean run_func(ObActionsData *data, gpointer options)
+static gboolean run_func(G_GNUC_UNUSED ObActionsData *data, gpointer options)
 {
     Options *o = options;
 

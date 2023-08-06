@@ -41,16 +41,12 @@ typedef void     (*ObActionsShutdownFunc)(void);
 /* functions for interactive actions */
 /* return TRUE if the action is going to be interactive, or false to change
    your mind and make it not */
-typedef gboolean (*ObActionsIPreFunc)(guint initial_state, gpointer options);
 typedef void     (*ObActionsIPostFunc)(gpointer options);
 typedef gboolean (*ObActionsIInputFunc)(guint initial_state,
                                         XEvent *e,
-                                        ObtIC *ic,
-                                        gpointer options,
-                                        gboolean *used);
+                                        gpointer options);
 typedef void     (*ObActionsICancelFunc)(gpointer options);
 typedef gpointer (*ObActionsIDataSetupFunc)(xmlNodePtr node,
-                                            ObActionsIPreFunc *pre,
                                             ObActionsIInputFunc *input,
                                             ObActionsICancelFunc *cancel,
                                             ObActionsIPostFunc *post);

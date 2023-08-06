@@ -23,7 +23,6 @@ static gboolean cycling = FALSE;
 
 static gpointer setup_func(xmlNodePtr node);
 static gpointer setup_cycle_func(xmlNodePtr node,
-                                 ObActionsIPreFunc *pre,
                                  ObActionsIInputFunc *input,
                                  ObActionsICancelFunc *cancel,
                                  ObActionsIPostFunc *post);
@@ -32,51 +31,41 @@ static void     free_func(gpointer options);
 static gboolean run_func(ObActionsData *data, gpointer options);
 static gboolean i_input_func(guint initial_state,
                              XEvent *e,
-                             ObtIC *ic,
-                             gpointer options,
-                             gboolean *used);
+                             gpointer options);
 static void     i_cancel_func(gpointer options);
 
 static void     end_cycle(gboolean cancel, guint state, Options *o);
 
 /* 3.4-compatibility */
 static gpointer setup_north_cycle_func(xmlNodePtr node,
-                                       ObActionsIPreFunc *pre,
                                        ObActionsIInputFunc *in,
                                        ObActionsICancelFunc *c,
                                        ObActionsIPostFunc *post);
 static gpointer setup_south_cycle_func(xmlNodePtr node,
-                                       ObActionsIPreFunc *pre,
                                        ObActionsIInputFunc *in,
                                        ObActionsICancelFunc *c,
                                        ObActionsIPostFunc *post);
 static gpointer setup_east_cycle_func(xmlNodePtr node,
-                                      ObActionsIPreFunc *pre,
                                       ObActionsIInputFunc *in,
                                       ObActionsICancelFunc *c,
                                       ObActionsIPostFunc *post);
 static gpointer setup_west_cycle_func(xmlNodePtr node,
-                                      ObActionsIPreFunc *pre,
                                       ObActionsIInputFunc *in,
                                       ObActionsICancelFunc *c,
                                       ObActionsIPostFunc *post);
 static gpointer setup_northwest_cycle_func(xmlNodePtr node,
-                                           ObActionsIPreFunc *pre,
                                            ObActionsIInputFunc *in,
                                            ObActionsICancelFunc *c,
                                            ObActionsIPostFunc *post);
 static gpointer setup_northeast_cycle_func(xmlNodePtr node,
-                                           ObActionsIPreFunc *pre,
                                            ObActionsIInputFunc *in,
                                            ObActionsICancelFunc *c,
                                            ObActionsIPostFunc *post);
 static gpointer setup_southwest_cycle_func(xmlNodePtr node,
-                                           ObActionsIPreFunc *pre,
                                            ObActionsIInputFunc *in,
                                            ObActionsICancelFunc *c,
                                            ObActionsIPostFunc *post);
 static gpointer setup_southeast_cycle_func(xmlNodePtr node,
-                                           ObActionsIPreFunc *pre,
                                            ObActionsIInputFunc *in,
                                            ObActionsICancelFunc *c,
                                            ObActionsIPostFunc *post);
@@ -197,10 +186,9 @@ static gpointer setup_func(xmlNodePtr node)
 }
 
 static gpointer setup_cycle_func(xmlNodePtr node,
-                                 ObActionsIPreFunc *pre,
                                  ObActionsIInputFunc *input,
                                  ObActionsICancelFunc *cancel,
-                                 ObActionsIPostFunc *post)
+                                 G_GNUC_UNUSED ObActionsIPostFunc *post)
 {
     Options *o = setup_func(node);
     o->interactive = TRUE;
@@ -255,9 +243,7 @@ static gboolean run_func(ObActionsData *data, gpointer options)
 
 static gboolean i_input_func(guint initial_state,
                              XEvent *e,
-                             ObtIC *ic,
-                             gpointer options,
-                             gboolean *used)
+                             gpointer options)
 {
     guint mods, initial_mods;
 
@@ -323,89 +309,81 @@ static void end_cycle(gboolean cancel, guint state, Options *o)
 
 /* 3.4-compatibility */
 static gpointer setup_north_cycle_func(xmlNodePtr node,
-                                       ObActionsIPreFunc *pre,
                                        ObActionsIInputFunc *input,
                                        ObActionsICancelFunc *cancel,
                                        ObActionsIPostFunc *post)
 {
-    Options *o = setup_cycle_func(node, pre, input, cancel, post);
+    Options *o = setup_cycle_func(node, input, cancel, post);
     o->direction = OB_DIRECTION_NORTH;
     return o;
 }
 
 static gpointer setup_south_cycle_func(xmlNodePtr node,
-                                       ObActionsIPreFunc *pre,
                                        ObActionsIInputFunc *input,
                                        ObActionsICancelFunc *cancel,
                                        ObActionsIPostFunc *post)
 {
-    Options *o = setup_cycle_func(node, pre, input, cancel, post);
+    Options *o = setup_cycle_func(node, input, cancel, post);
     o->direction = OB_DIRECTION_SOUTH;
     return o;
 }
 
 static gpointer setup_east_cycle_func(xmlNodePtr node,
-                                      ObActionsIPreFunc *pre,
                                       ObActionsIInputFunc *input,
                                       ObActionsICancelFunc *cancel,
                                       ObActionsIPostFunc *post)
 {
-    Options *o = setup_cycle_func(node, pre, input, cancel, post);
+    Options *o = setup_cycle_func(node, input, cancel, post);
     o->direction = OB_DIRECTION_EAST;
     return o;
 }
 
 static gpointer setup_west_cycle_func(xmlNodePtr node,
-                                      ObActionsIPreFunc *pre,
                                       ObActionsIInputFunc *input,
                                       ObActionsICancelFunc *cancel,
                                       ObActionsIPostFunc *post)
 {
-    Options *o = setup_cycle_func(node, pre, input, cancel, post);
+    Options *o = setup_cycle_func(node, input, cancel, post);
     o->direction = OB_DIRECTION_WEST;
     return o;
 }
 
 static gpointer setup_northwest_cycle_func(xmlNodePtr node,
-                                           ObActionsIPreFunc *pre,
                                            ObActionsIInputFunc *input,
                                            ObActionsICancelFunc *cancel,
                                            ObActionsIPostFunc *post)
 {
-    Options *o = setup_cycle_func(node, pre, input, cancel, post);
+    Options *o = setup_cycle_func(node, input, cancel, post);
     o->direction = OB_DIRECTION_NORTHWEST;
     return o;
 }
 
 static gpointer setup_northeast_cycle_func(xmlNodePtr node,
-                                           ObActionsIPreFunc *pre,
                                            ObActionsIInputFunc *input,
                                            ObActionsICancelFunc *cancel,
                                            ObActionsIPostFunc *post)
 {
-    Options *o = setup_cycle_func(node, pre, input, cancel, post);
+    Options *o = setup_cycle_func(node, input, cancel, post);
     o->direction = OB_DIRECTION_EAST;
     return o;
 }
 
 static gpointer setup_southwest_cycle_func(xmlNodePtr node,
-                                           ObActionsIPreFunc *pre,
                                            ObActionsIInputFunc *input,
                                            ObActionsICancelFunc *cancel,
                                            ObActionsIPostFunc *post)
 {
-    Options *o = setup_cycle_func(node, pre, input, cancel, post);
+    Options *o = setup_cycle_func(node, input, cancel, post);
     o->direction = OB_DIRECTION_SOUTHWEST;
     return o;
 }
 
 static gpointer setup_southeast_cycle_func(xmlNodePtr node,
-                                           ObActionsIPreFunc *pre,
                                            ObActionsIInputFunc *input,
                                            ObActionsICancelFunc *cancel,
                                            ObActionsIPostFunc *post)
 {
-    Options *o = setup_cycle_func(node, pre, input, cancel, post);
+    Options *o = setup_cycle_func(node, input, cancel, post);
     o->direction = OB_DIRECTION_SOUTHEAST;
     return o;
 }

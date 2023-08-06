@@ -10,7 +10,7 @@ const gchar* g_active_test_name = NULL;
 /* Add all test suites here. Keep them sorted. */
 extern void run_bsearch_unittest();
 
-gint main(gint argc, gchar **argv)
+gint main(void)
 {
     /* Add all test suites here. Keep them sorted. */
     run_bsearch_unittest();

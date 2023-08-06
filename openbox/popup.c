@@ -116,11 +116,6 @@ void popup_text_width_to_string(ObPopup *self, gchar *text)
         self->textw = 0;
 }
 
-void popup_height_to_string(ObPopup *self, gchar *text)
-{
-    self->h = RrMinHeight(self->a_text) + ob_rr_theme->paddingy * 2;
-}
-
 void popup_text_width_to_strings(ObPopup *self, gchar **strings, gint num)
 {
     gint i, maxw;
